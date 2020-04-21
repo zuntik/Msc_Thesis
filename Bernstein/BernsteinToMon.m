@@ -1,5 +1,9 @@
 function mon = BernsteinToMon(p, T)
     
+    if size(p,1)==1 && size(p,2) ~= 1
+        p = p';
+    end
+    
     N = size(p,1)-1;
     mon = zeros(size(p));
     for k = 0:N
