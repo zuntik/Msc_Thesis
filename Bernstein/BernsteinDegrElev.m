@@ -16,6 +16,10 @@ function new_cp = BernsteinDegrElev(cp, m)
     end
     
     n = num_points-1;
+    
+    if n==m
+        return
+    end
     assert(m>n,'new degree not greater than current');
     
 	new_cp = zeros(m+1, dim);

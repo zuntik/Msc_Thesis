@@ -8,18 +8,14 @@ function [points] = BernsteinEval(p,T,times)
 %   times are the points to evaluate
 
     [num_points,dim] = size(p);
-    
     if num_points==1 && dim ~= 1
         p = p';
-        dim = dim+num_points;
-        num_points= dim - num_points;
-        dim = dim- num_points;
+    end
+    [num_points,dim] = size(p);
+    if dim==1
+        points = arrayfun(@(t)BernsteinEvalMat(size(p,1)-1,T,t)*p,times);
+    else
+        points = BernsteinEvalMat(size(p,1)-1,T,times(:))*p;
     end
     
-    points = zeros(dim,length(times));    
-    for t = 1:length(times)
-        for i = 1:dim
-            points(i,t) = deCasteljau(p(:,i), num_points, num_points, times(t)/T);
-        end
-    end
 end

@@ -1,8 +1,10 @@
+clear all
+close all
 
 %% Test the Basis equation
 
 figure, hold on
-fplot(@(x)BernsteinBasis(2,5,x),[0 1]);
+fplot(@(times)arrayfun(@(t)BernsteinBasis(2,5,t),times),[0 1]);
 fplot(@(x)(BernsteinEval([0,0,1,0,0,0],1,x)-0.01),[0 1])
 
 %%
@@ -10,7 +12,7 @@ fplot(@(x)(BernsteinEval([0,0,1,0,0,0],1,x)-0.01),[0 1])
 figure, hold on
 p = [ 2 4 -1 2 5];
 
-fplot(@(x) sum(arrayfun(@(i) (p(i)*BernsteinBasis(i-1,4,x)),1:5)) ,[0 1]);
+fplot(@(times)arrayfun(@(x) sum(arrayfun(@(i) (p(i)*BernsteinBasis(i-1,4,x)),1:5)), times),[0 1]);
 
 BernsteinPlot(p-0.1,1,'PlotControlPoints',false);
 

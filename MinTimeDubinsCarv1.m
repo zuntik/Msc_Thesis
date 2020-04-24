@@ -142,20 +142,10 @@ options = optimoptions(@fmincon,'Algorithm','sqp',...
 % %                       'FunctionTolerance',1e-8,..
 %                       'ConstraintTolerance',1e-3);
 
-disp('norm of linear contraints before');
-disp(norm(Aeq*X-beq));
-disp('norm of nonlinear constraints before');
-[ c , ceq]= nonlcon(X);
-disp(norm(ceq));
-
 tic;
     [xOut,Jout,exitflag,output] = fmincon(@costFunc,X,A,b,Aeq,beq,lb,ub,@nonlcon,options);
 toc
 
-disp('norm of linear contraints after');
-disp(norm(Aeq*xOut-beq));
-disp('norm of nonlinear constraints after');
-disp(norm(nonlcon(xOut)));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Plot results

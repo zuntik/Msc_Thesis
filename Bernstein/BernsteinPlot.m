@@ -14,13 +14,13 @@ function BernsteinPlot(p,T,varargin)
     end
     
     if dim == 1
-        fplot(@(t)(BernsteinEval(p,T,t)),[0 T]);
+        fplot(@(times)arrayfun(@(t)(BernsteinEval(p,T,t)),times),[0 T]);
         if parser.Results.PlotControlPoints
             scatter(0:T/(n-1):T, p);
         end
     elseif dim == 2
-        xt = @(t) BernsteinEval(p(:,1),T,t);
-        yt = @(t) BernsteinEval(p(:,2),T,t);
+        xt = @(times)arrayfun(@(t)BernsteinEval(p(:,1),T,t),times);
+        yt = @(times)arrayfun(@(t)BernsteinEval(p(:,2),T,t),times);
         fplot(xt,yt,[0 T]);
         if parser.Results.PlotControlPoints
             scatter(p(:,1)',p(:,2)');
@@ -35,9 +35,12 @@ function BernsteinPlot(p,T,varargin)
         xlabel('Position x (m)');
         ylabel('Position y (m)');
     elseif dim == 3
-        xt = @(t) BernsteinEval(p(:,1),T,t);
-        yt = @(t) BernsteinEval(p(:,2),T,t);
-        zt = @(t) BernsteinEval(p(:,3),T,t);
+        %xt = @(t) BernsteinEval(p(:,1),T,t);
+        xt = @(times)arrayfun(@(t)BernsteinEval(p(:,1),T,t),times);
+        %yt = @(t) BernsteinEval(p(:,2),T,t);
+        yt = @(times)arrayfun(@(t)BernsteinEval(p(:,2),T,t),times);
+        %zt = @(t) BernsteinEval(p(:,3),T,t);
+        zt = @(times)arrayfun(@(t)BernsteinEval(p(:,3),T,t),times);
         fplot3(xt,yt,zt,[0 T]);
         view(3);
         if parser.Results.PlotControlPoints

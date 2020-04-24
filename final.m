@@ -4,15 +4,15 @@ addpath('Bernstein');
 
 %% Settings
 
-N = 20; % order
+N = 40; % order
 T = 10; % time interval
 
 %% Boundary Conditions
 psi_0 = 0;
 psi_f= 0 ;
 
-init_conds = [3 5 cos(psi_0) sin(psi_0) 1]; % x y r1 r2 v
-final_conds = [0 0 cos(psi_f) sin(psi_f) 0]; % inf <=> don't care
+init_conds = [3 5 cos(psi_0) sin(psi_0) 1 0]; % x y r1 r2 v w
+final_conds = [0 0 cos(psi_f) sin(psi_f) 0 0]; % inf <=> don't care
 
 
 %% Linear Constraints
@@ -21,9 +21,10 @@ final_conds = [0 0 cos(psi_f) sin(psi_f) 0]; % inf <=> don't care
 
 %% Initial Guess
 
-X = InitialGuess(N, T, init_conds, final_conds);
+xIn = InitialGuess(N, T, init_conds, final_conds);
 
-[~, ceq] = basicnonlcon(X,N,T);
+[~, ceq] = basicnonlcon(xIn,N,T);
+
 
 
 %% DO the bloody thing
@@ -33,78 +34,104 @@ b = [];
 
 nonlcon=@(x) basicnonlcon(x,N,T);
 
-options = optimoptions(@fmincon,'Algorithm','sqp',...
-                       'MaxFunctionEvaluations',40000,...
-                       'ConstraintTolerance',1e-6,...
-                       'StepTolerance',1e-6,...
-                       'Display','iter');
-%                        'OptimalityTolerance',1e-8,...
-% %                       'FunctionTolerance',1e-8,..
-%                       'ConstraintTolerance',1e-3);
+% options = optimoptions(@fmincon,'Algorithm','sqp',...
+%                        'MaxFunctionEvaluations',40000,...
+%                        'ConstraintTolerance',1e-6,...
+%                        'StepTolerance',1e-6,...
+%                        'Display','iter');
+% %                        'OptimalityTolerance',1e-8,...
+% % %                       'FunctionTolerance',1e-8,..
+% %                       'ConstraintTolerance',1e-3);
 
-%options = optimoptions(@fmincon,'Algorithm','sqp');
+options = optimoptions(@fmincon,'Algorithm','sqp');
 
 tic;
-    [xOut,Jout,exitflag,output] = fmincon(@(x)costFunc(x,N,T),X,A,b,Aeq,beq,lb,ub,nonlcon,options);
+    [xOut,Jout,exitflag,output] = fmincon(@(x)costFunc(x,N,T),xIn,A,b,Aeq,beq,lb,ub,nonlcon,options);
 toc
 
 %% Test the functions
+close all
 
+dxOut = BernsteinDeriv(xOut,T);
+dxOut_squared = BernsteinPow(dxOut,2);
+
+figure
 axis equal
+title('x y plane')
 BernsteinPlot(xOut(:,1:2),T,'PlotControlPoints',false);
+
+figure
+title('compare vels')
+hold on
+BernsteinPlot(xOut(:,5)-0.01,T,'PlotControlPoints',false);
+vel = @(times)arrayfun(@(t)sqrt(sum(BernsteinEval(dxOut_squared(:,1:2),T,t),2)),times);
+fplot(vel,[0 T]);
+legend('v','sqrt(dx^2+dy^2)');
+hold off
+disp(['first true vel: ',num2str(vel(0))])
+disp(['last true vel: ',num2str(vel(T))])
+
+
+figure
+hold on
+title('compare angles');
+psi = @(times)arrayfun(@(t)atan2(BernsteinEval(xOut(:,4),T,t),BernsteinEval(xOut(:,3),T,t)),times);
+psi2= @(times)arrayfun(@(t)atan2(BernsteinEval(dxOut(:,2),T,t),BernsteinEval(dxOut(:,1),T,t)),times);
+fplot(psi,[0 T]);
+fplot(@(t)psi2(t)-0.1,[0 T]);
+legend('atan2(c,s)','atan2(dy,dx)');
+disp(psi(0));
+disp(['first psi: ',num2str(psi(0))]);
+disp(['last psi: ',num2str(psi(T))]);
+disp((Aeq*xOut(:)-beq).');
+
+
 
 %% Cost function
 function J = costFunc(X,N,T)
 
-    [px, py, r1, r2, v, dx, dy, dr1, dr2, dv, ~, ~] = getControlPoints(X,N,T);
-    rho = 100;
+    [~, ~, ~, ~, ~, ~, ~, ~, v, w]  = getControlPoints(X,N,T);
 
-    deriv_mul = @(a,da,b,db) BernsteinSum(BernsteinMul(da,b),BernsteinMul(a,db));
     b_sq_int = @(p) BernsteinIntegr(BernsteinPow(p,2),T);
 
-    % J1 = \int_0^T x^2 + dx^2 + rho ddx^2 dt
-    J1 = b_sq_int(px) + b_sq_int(dx) + rho * b_sq_int(deriv_mul(v,dv,r1,dr1));
-    J2 = b_sq_int(py) + b_sq_int(dy) + rho * b_sq_int(deriv_mul(v,dv,r2,dr2));
-    J = norm([J1 J2]);
+    cw = 1;
+    cv = 1;
+    
+    J = cw * b_sq_int(w) + cv* b_sq_int(v);
 
 end
 
 
 %% Linear contraints
 % The linear contraints set the boundary conditions
-function [Aeq, beq,lb,ub] = LinConstr(N,T,x0,xf)
-    Aeq_boundary = zeros(5,(N+1)*7);
+function [Aeq, beq,lb,ub] = LinConstr(N,T,xi,xf)
+    
+    Aeq = zeros(6,(N+1)*6);
 
-    Aeq_boundary(1,1)         = 1; % x0
-    Aeq_boundary(2,1*(N+1)+1) = 1; % y0
-    Aeq_boundary(3,2*(N+1)+1) = 1; % r10
-    Aeq_boundary(4,3*(N+1)+1) = 1; % r20
-    Aeq_boundary(5,4*(N+1)+1) = 1; % v0
-    
-    beq_boundary = x0';
-    
+    for i = 1:6
+        Aeq(i,1+(i-1)*(N+1)) = 1;
+    end
+
+    beq = xi';
+
     for i = 1:length(xf)
         if xf(i) ~= Inf
-            Aeq_boundary(end+1, i*(N+1)) = 1;
-            beq_boundary(end+1) = xf(i);
+            Aeq(end+1, i*(N+1)) = 1;
+            beq(end+1) = xf(i);
         end
     end
 
-    Aeq_dyn = [ zeros(N+1,(N+1)*4), BernsteinDerivElevMat(N,T), zeros(N+1), -eye(N+1) ]; % dv = u2
-    beq_dyn = zeros(N+1,1);
-
-    Aeq = [Aeq_boundary; Aeq_dyn];
-    beq = [beq_boundary; beq_dyn];
-    
     % variable bounds
     
     % states
-    x_ub = ones(5*(N+1),1)*Inf;
+    x_ub = ones(4*(N+1),1)*Inf;
     x_lb = -x_ub;
 
     % control 
-    u_ub = ones(2*(N+1),1)*Inf;
-    u_lb = -u_ub; 
+    
+    vmax = norm(xf(1:2)-xi(1:2))/T*1.5;
+    u_ub = ones((N+1),2).*[vmax 10*180/pi ];
+    u_lb = ones((N+1),2).*[0 -10*180/pi]; 
 
     lb = [x_lb(:); u_lb(:)];
     ub = [x_ub(:); u_ub(:)];
@@ -117,23 +144,14 @@ end
 % account
 function [c, ceq] = basicnonlcon(X,N,T)
 
-    [~, ~, r1, r2, v, dx, dy, dr1, dr2, ~, u1, ~] = getTrajectories(X,N,T);
+    [~, ~, c, s, dx, dy, dc, ds, w, v] = getTrajectories(X,N,T);
 
-%     Mag = sqrt(r1.^2 + r2.^2);
-%     r1 = (r1 + eps)./(Mag+eps); r2 = (r2 + eps)./(Mag + eps);
-%     ceq = [
-%         dx - v.*r1
-%         dy - v.*r2
-%         dr1 + r2.*u1
-%         dr2 - r1.*u1
-%     ]; 
-    
     ceq = [
-        dx - v.*r1
-        dy - v.*r2
-        dr1 + r2.*u1
-        dr2 - r1.*u1
-        r1.^2 + r2.^2 - 1
+        dx - v.*c
+        dy - v.*s
+        dc + s.*w
+        ds - c.*w
+        c.^2 + s.^2 - 1
         %v.^2 - dx.^2 - dy.^2
     ];
 
@@ -143,15 +161,15 @@ end
 
 %% Initial Guess
 function [X] = InitialGuess(N, T, init_conds, final_conds)
-    X = zeros(N+1,7);
+    X = zeros(N+1,6);
     
     final_conds(final_conds==Inf) = 0;
     
     vi = init_conds(5)  .* init_conds(3:4);
     vf = final_conds(5) .* final_conds(3:4);
     
-    X(1,1:5) = init_conds;
-    X(end,1:5) = final_conds;
+    X(1,1:6) = init_conds;
+    X(end,1:6) = final_conds;
     
     min_dist = norm(final_conds(1:2)-init_conds(1:2));
     
@@ -185,7 +203,7 @@ end
 
 
 %% Get Control Points of Trajectories
-function [px, py, r1, r2, v, dx, dy, dr1, dr2, dv, u1, u2] = getControlPoints(X,N,T)
+function [px, py, c, s, dx, dy, dc, ds, v, w] = getControlPoints(X,N,T)
     
     persistent old_N old_T d_mat
     if  isempty(old_N) || isempty(old_T) || old_N ~= N || old_T ~= T
@@ -194,29 +212,27 @@ function [px, py, r1, r2, v, dx, dy, dr1, dr2, dv, u1, u2] = getControlPoints(X,
         d_mat = BernsteinDerivElevMat(N,T);
     end
     
-    X = reshape(X(:), [N+1,7]); % this step could be redundant
+    X = reshape(X(:), [N+1,6]); % this step could be redundant
 
     % get control points
     px = X(:,1);
     py = X(:,2);
-    r1 = X(:,3);
-    r2 = X(:,4);
+    c = X(:,3);
+    s = X(:,4);
     v = X(:,5);
-    u1 = X(:,6);
-    u2 = X(:,7);
+    w = X(:,6);
 
     % compute  derivatives 
     dX  = d_mat*X;
     dx  = dX(:,1);
     dy  = dX(:,2);
-    dr1 = dX(:,3);
-    dr2 = dX(:,4);
-    dv  = dX(:,5);
+    dc = dX(:,3);
+    ds = dX(:,4);
 
 end
 
-%% Get Control Points of Trajectories
-function [px, py, r1, r2, v, dx, dy, dr1, dr2, dv, u1, u2] = getTrajectories(X,N,T)
+%% Get Trajectories
+function [px, py, c, s, dx, dy, dc, ds, w, v] = getTrajectories(X,N,T)
     
     persistent old_N old_T d_mat eval_mat
     if  isempty(old_N) || isempty(old_T) || old_N ~= N || old_T ~= T
@@ -226,28 +242,25 @@ function [px, py, r1, r2, v, dx, dy, dr1, dr2, dv, u1, u2] = getTrajectories(X,N
         eval_mat = BernsteinCtrlPntsEval(N);
     end
     
-    X = reshape(X(:), [N+1,7]); % this step could be redundant
+    X = reshape(X(:), [N+1,6]); % this step could be redundant
 
     dX = d_mat*X;
     X  = eval_mat*X;
     dX = eval_mat*dX;
     
-    
-    % get points
+    % get control points
     px = X(:,1);
     py = X(:,2);
-    r1 = X(:,3);
-    r2 = X(:,4);
+    c = X(:,3);
+    s = X(:,4);
     v = X(:,5);
-    u1 = X(:,6);
-    u2 = X(:,7);
+    w = X(:,6);
 
     % compute  derivatives 
-
     dx  = dX(:,1);
     dy  = dX(:,2);
-    dr1 = dX(:,3);
-    dr2 = dX(:,4);
-    dv  = dX(:,5);
+    dc = dX(:,3);
+    ds = dX(:,4);
 
 end
+

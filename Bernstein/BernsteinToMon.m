@@ -8,7 +8,7 @@ function mon = BernsteinToMon(p, T)
     mon = zeros(size(p));
     for k = 0:N
         for i = 0:k
-            mon(k+1,:) = mon(k+1,:) + nchoosek(N,k)*nchoosek(k,i)*(-1)^(k-i)*p(i+1,:);
+            mon(k+1,:) = mon(k+1,:) + nchoosek_mod(N,k)*nchoosek_mod(k,i)*(-1)^(k-i)*p(i+1,:);
         end
     end
     mon = flipud(mon);
