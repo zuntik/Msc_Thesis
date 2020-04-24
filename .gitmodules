@@ -1,0 +1,3 @@
+[submodule "Bernstein"]
+	path = Bernstein
+	url = https://github.com/zuntik/BernsteinLib
