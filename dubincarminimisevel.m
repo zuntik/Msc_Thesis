@@ -1,10 +1,10 @@
 clear; close all;
 
 addpath('Bernstein');
+addpath('BeBOT_lib');
 
 %% Settings
 
-N = 15; % order
 T = 10; % time interval
 
 %% Boundary Conditions
@@ -16,95 +16,98 @@ final_conds = [0 0 cos(ang_f) sin(ang_f) 0 0]; % inf <=> don't care
 
 %% run
 
-%N = [ 4 5 8 10 13 20 40 50 100 ];
+N = [ 4 5 8 10 13 20 40 50 100 ];
 N = 5:12;
-%N = logspace(log10(5),log10(100),8);
+% N = logspace(log10(5),log10(100),8);
+% N = [7 10 14];
+N = 14;
+
 sols = cell(1,length(N));
 
+%shapes = [  1 1.5 ; 1 2.5 ; 2 2.5 ; 2 1.5 ];
+shapes = [];
+nonlcon = @(X,N,T) nonlcon_obstacle(X,N,T,shapes);
+%nonlcon = @basicnonlcon;
+
 for i = 1:length(N)
-    [xIn,xOut,dur,Jout,constraints] = run_problem(init_conds,final_conds,N(i),T,@basicnonlcon,@costFunc);
+    [xIn,xOut,dur,Jout,constraints] = run_problem(init_conds,final_conds,N(i),T,nonlcon,@costFunc);
     sols{i} = struct('N',N(i),'dur',dur,'xIn',xIn,'xOut',xOut,'Jout',Jout,'constraints',constraints);
 end
 
-%%
-figure(1), sgtitle('x y plane'),set(gcf,'WindowState','fullscreen')
-figure(2), sgtitle('compare vels'),set(gcf,'WindowState','fullscreen')
-figure(3), sgtitle('compare angles'),set(gcf,'WindowState','fullscreen')
+%% post process
 
-for i = 1:length(N)
-    s = sols{i};
-    plotstuff(s.xIn,s.xOut,T,2,4,i)
+if length(N) ~= 1
+    figure(1), sgtitle('x y plane')
+    figure(2), sgtitle('compare vels')
+    figure(3), sgtitle('compare angles')
+    for i = 1:length(N)
+        s = sols{i};
+        plotstuff(s.xIn,s.xOut,T,shapes,2,4,i)
+    end
+    evolution(sols,N);
+else
+    figure(1), title('x y plane')
+    figure(2), title('compare vels')
+    figure(3), title('compare angles')
+    plotstuff(xIn,xOut,T,shapes)
+    testconstraints(xIn, xOut, N, T, constraints)
 end
-
-figure(4)
-set(gcf,'WindowState','fullscreen')
-
-subplot(2,2,1)
-plot(N,arrayfun(@(i)sols{i}.Jout,1:length(N)))
-title('cost')
-xlabel('N (order)'), ylabel('Jout')
-
-subplot(2,2,2)
-plot(N,arrayfun(@(i)sols{i}.dur,1:length(N)))
-title('duration')
-xlabel('N (order)'), ylabel('runtime (s)')
-
-subplot(2,2,3)
-plot(N,arrayfun(@(i)norm(sols{i}.constraints.Aeq*sols{i}.xOut(:)-sols{i}.constraints.beq),1:length(N)));
-title('norm linear error')
-xlabel('N (order)'), ylabel('linear error')
-
-subplot(2,2,4)
-nonlcon_norms = zeros(1,length(N));
-for i = 1:length(N)
-    [~,ceq] = sols{i}.constraints.nonlcon(sols{i}.xOut(:));
-    nonlcon_norms(i) = norm(ceq);
-end
-plot(N,nonlcon_norms);
-title('norm nonlinear error')
-xlabel('N (order)'), ylabel('nonlinear error')
 
 %% Plot stuff
-function plotstuff(xIn,xOut, T,m,n,i)
+function plotstuff(xIn,xOut, T,shapes,m,n,i)
 
     N = size(xIn,1)-1;
 
     dxOut = BernsteinDeriv(xOut,T);
     dxOut_squared = BernsteinPow(dxOut,2);
 
-%     figure, grid on, axis equal
+%     figure(4), grid on, axis equal
 %     title('x y plane initial guess')
 %     BernsteinPlot(xIn(:,1:2),T,'PlotControlPoints',false);
 
     figure(1)
+    if nargin > 4
+        subplot(m,n,i)
+        title(['N = ',num2str(N)])
+    end
+    grid on, axis equal
     xlabel('x (m)')
     ylabel('y (m)')
-    subplot(m,n,i), grid on, axis equal
-    title(['N = ',num2str(N)])
     BernsteinPlot(xOut(:,1:2),T,'PlotControlPoints',false);
     [~,xy] = recoverplot(xOut,T);
     plot(xy(:,1),xy(:,2));
-    legend('result','recovered');
-
+    if ~isempty(shapes)
+        for i = 1:size(shapes,3)
+            plot(polyshape(shapes(:,:,i)))
+        end
+    end
+    legend('result','recovered')
+    
     figure(2)
-    subplot(m,n,i), grid on, hold on
+    if nargin > 4
+        subplot(m,n,i)
+        title(['N = ',num2str(N)])
+    end
+    grid on, hold on
     xlabel('t (s)');
     ylabel('vel (m/s)');
-    title(['N = ',num2str(N)])
-    BernsteinPlot(xOut(:,5)-0.01,T,'PlotControlPoints',false);
+    BernsteinPlot(xOut(:,5),T,'PlotControlPoints',false);
     vel = @(times)arrayfun(@(t)sqrt(sum(BernsteinEval(dxOut_squared(:,1:2),T,t),2)),times);
     fplot(vel,[0 T]);
-    legend('v','sqrt(dx^2+dy^2)');
+    legend('v','sqrt(dx^2+dy^2)')
 
     figure(3)
-    subplot(m,n,i), hold on, grid on
+    if nargin > 4
+        subplot(m,n,i)
+        title(['N = ',num2str(N)])
+    end
+    grid on, hold on
     xlabel('t (s)')
     ylabel('ang (rad)')
-    title(['N = ',num2str(N)]);
     ang  = @(times)arrayfun(@(t)atan2(BernsteinEval(xOut(:,4),T,t),BernsteinEval(xOut(:,3),T,t)),times);
     ang2 = @(times)arrayfun(@(t)atan2(BernsteinEval(dxOut(:,2),T,t),BernsteinEval(dxOut(:,1),T,t)),times);
     fplot(ang,[0 T]);
-    fplot(@(t)ang2(t)-0.05,[0 T]);
+    fplot(@(t)ang2(t),[0 T]);
     legend('atan2(c,s)','atan2(dy,dx)');
 
 end
@@ -132,6 +135,37 @@ function testconstraints(xIn, xOut, N, T, constraints)
     disp(['sol respect upper bounds? ',num2str(all(reshape(constraints.ub,[N+1 6])-xOut>=0,'all'))]);
     disp(['sol respect lower bounds? ',num2str(all(xOut-reshape(constraints.lb,[N+1 6]) >=0,'all'))]);
 
+end
+
+function evolution(sols,N)
+
+    figure(4)
+    %set(gcf,'WindowState','fullscreen')
+
+    subplot(2,2,1)
+    plot(N,arrayfun(@(i)sols{i}.Jout,1:length(N)))
+    title('cost')
+    xlabel('N (order)'), ylabel('Jout')
+
+    subplot(2,2,2)
+    plot(N,arrayfun(@(i)sols{i}.dur,1:length(N)))
+    title('duration')
+    xlabel('N (order)'), ylabel('runtime (s)')
+
+    subplot(2,2,3)
+    plot(N,arrayfun(@(i)norm(sols{i}.constraints.Aeq*sols{i}.xOut(:)-sols{i}.constraints.beq),1:length(N)));
+    title('norm linear error')
+    xlabel('N (order)'), ylabel('linear error')
+
+    subplot(2,2,4)
+    nonlcon_norms = zeros(1,length(N)); 
+    for i = 1:length(N)
+        [~,ceq] = sols{i}.constraints.nonlcon(sols{i}.xOut(:));
+        nonlcon_norms(i) = norm(ceq);
+    end
+    plot(N,nonlcon_norms);
+    title('norm nonlinear error')
+    xlabel('N (order)'), ylabel('nonlinear error')
 end
 
 
@@ -206,14 +240,14 @@ end
 % The linear contraints set the boundary conditions
 function [Aeq, beq,lb,ub] = LinConstr(N,T,xi,xf)
 
+    % initial conds
     Aeq = zeros(6,(N+1)*6);
-
     for i = 1:6
         Aeq(i,1+(i-1)*(N+1)) = 1;
     end
-
     beq = xi(:);
 
+    % final conds
     xf=xf(xf~=Inf);
     Aeq=[Aeq;zeros(length(xf),(N+1)*6)];
     for i = 1:length(xf)
@@ -221,6 +255,30 @@ function [Aeq, beq,lb,ub] = LinConstr(N,T,xi,xf)
     end
     beq=[beq;xf(:)];
 
+    % optional part: help with derivatives
+    if true
+        Aeq(end+1,1:2) = [ -N/T, N/T ];
+        Aeq(end+1, (N+1)+1:(N+1)+2) = [ -N/T, N/T ];
+        beq = [beq ; xi(5).*xi(3:4).'];
+
+        Aeq(end+1, (N+1)-1:(N+1)) = [ -N/T, N/T ];
+        Aeq(end+1, (N+1)*2-1:(N+1)*2) = [ -N/T, N/T ];
+        beq = [beq ; xf(5).*xf(3:4).'];
+    end
+    
+    if xi(5) == 0 && true
+        disp('using cool constraint for initial condition')
+        Aeq(end+1,3) = xi(4);
+        Aeq(end,(N+1)+3) = xi(3);
+        beq = [beq; xi(4)*xi(1)-xi(3)*xi(2)];
+    end
+    if xf(5) == 0 && true
+        disp('using cool constraint for final condition')
+        Aeq(end+1,(N+1)-2) = xf(4);
+        Aeq(end,2*(N+1)-2) = -xf(3);
+        beq = [beq; xf(4)*xf(1)-xf(3)*xf(2)];
+    end
+    
     % variable bounds
 
     % states
@@ -261,6 +319,21 @@ function [c, ceq] = basicnonlcon(X,N,T)
 
 end
 
+function [c, ceq] = nonlcon_obstacle(X,N,T,shapes)
+    [~, ceq] = basicnonlcon(X,N,T);
+
+    if ~isempty(shapes)
+        c = zeros(size(shapes,3),1);
+        for i = 1:size(shapes,3)
+            c = 0.01-MinDistBernstein2Polygon(X(:,[1:2]).', shapes(:,:,i).');
+        end
+    else
+        c = [];
+    end
+
+end
+
+
 %% Initial Guess
 function [X] = InitialGuess(N, T, init_conds, final_conds)
     X = zeros(N+1,6);
@@ -284,8 +357,18 @@ function [X] = InitialGuess(N, T, init_conds, final_conds)
     X(end-2,1:2) = X(end-1,1:2) - (min_dist/N).*final_conds(3:4);
     
     % place remaning control points in a straight line
-    X(3:end-2,1) = linspace(X(3,1),X(end-2,1),N-3);
-    X(3:end-2,2) = linspace(X(3,2),X(end-2,2),N-3);
+%     X(3:end-2,1) = linspace(X(3,1),X(end-2,1),N-3);
+%     X(3:end-2,2) = linspace(X(3,2),X(end-2,2),N-3);
+    
+    %%%%%
+    % this code is to avoid the obstacle
+%     mid = floor(N/2);
+%     X(mid,1:2) = [0 3];
+%     X(3:mid,1) = linspace(X(3,1),X(mid,1),size(X(3:mid,1),1));
+%     X(3:mid,2) = linspace(X(3,2),X(mid,2),size(X(3:mid,1),1));
+%     X(mid:end-2,1) = linspace(X(mid,1),X(end-2,1),size(X(mid:end-2,1),1));
+%     X(mid:end-2,2) = linspace(X(mid,2),X(end-2,2),size(X(mid:end-2,1),1));
+    %%%%%
     
     vec = X(end-2,1:2) - X(3,1:2);
     
