@@ -1,40 +1,62 @@
-function [dist, pt1, pt2, simplex] = gjk2(shape1,shape2)
+function [intersection,simplex] = gjk2(shapeA,shapeB)
+%function [dist, pt1, pt2, simplex] = gjk2(shapeA,shapeB)
 
-    [S,pts] = supportwrapper(shape1,shape2,[1 0].');
+    %[S,pts] = supportwrapper(shape1,shape2,[1 0].');
+    % point is a struct
+    point = supportwrapper(shapeA,shapeB,[1 0].');
+    
+    %simplex = {struct('vert',S,'pts',pts)};
+    simplex = {struct('vert',point)};
+    d = [-1 0].'; 
 
-    simplex = {struct('vert',S,'pts',pts)};
-    D = -S; 
-
-    while True
-        [A,pts] = supportwrapper(shapeA,shapeB,D);
-        if dot(A,D) < 0
-            intersection = False;
+    while true
+        simplex{end+1} = struct('vert',supportwrapper(shapeA,shapeB,d));
+        %[A,pts] = supportwrapper(shapeA,shapeB,D);
+        if dot(simplex{end}.vert,d) < 0
+            intersection = false;
             break
         end
-        simplex{end+1} = struct('vert',A,'pts',pts);
-        [intersection,simplex,D] = doSimplex(simplex);
+        %simplex{end+1} = struct('vert',A,'pts',pts);
+        [intersection,simplex,d] = containsorigin(simplex);
         if intersection
-            break
+            break;
         end
     end
 
-
-
 end
 
 
-function simplex = doSimplex(simplex)
-    switch length(simplex)
-        case 2
-            simplex = linesimplex(simplex);
-        case 3
-            simplex = triagsimplex(simplex);
+function [intersection,simplex,d] = containsorigin(simplex)
+    a = simplex{end};
+    a0 = -a.vert;
+    if length(simplex) == 3
+        b = simplex{end-1};
+        c = simplex{end-2};
+        ab = b.vert - a.vert;
+        ac = c.vert - a.vert;
+        abPerp = tripleProduct(ac,ab,ab);
+        acPerp = tripleProduct(ab,ac,ac);
+        if dot(abPerp,a0)> 0
+            simplex(end-2) = [];
+            d = abPerp;
+        elseif dot(acPerp,a0) > 0
+            simplex(end-1) = [];
+            d = acPerp;
+        else
+            intersection=true;
+            d = [];
+            return
+        end
+    else
+        b = simplex{1};
+        ab = b.vert - a.vert;
+        abPerp = tripleProduct(ab,a0,ab);
+        d = abPerp;
     end
+
+    intersection=false;
 end
 
-function simplex = linesimplex(simplex)
-    if 
-end
 
 function [diff,pts] = supportwrapper(shapeA,shapeB,D)
     % shapeA and shapeB are structs
@@ -49,8 +71,9 @@ end
 
 
 function [vec] = tripleProduct(A,B,C)
-
+    vec = B.*(dot(C,A))-A.*(dot(C,B));
 end
+
 
 function [closestPt, t] = dist2line(A, B)
 %DIST2LINE Finds the closest point on a line segment to the origin.
@@ -88,34 +111,25 @@ function [closestPt, t] = dist2line(A, B)
 end
 
 
-classdef ConvexFigure 
-    methods(Abstract)
-        point = support(direction);
+function [intersects, tr,ts] = segrayintersect(rayOrigin, rayDirection, point1, point2)
+% https://stackoverflow.com/a/32146853
+
+    v1 = rayOrigin - point1;
+    v2 = point2 - point1;
+    v3 = [-rayDirection(2), rayDirection(1)].';
+
+    dot_prod = dot(v2,v3);
+    if abs(dot_prod) < 0.000001
+        intersects = false;
+        return
     end
-end
-
-
-classdef ConvexPolygon < ConvexFigure
-    % a 2D convex shape defined by points
     
-    properties
-        matrix
-        % x1 y1
-        % x2 y2
-        % ...
-        % xN yN
-    end
-        
-    methods
-        function obj = ConvexPolygon(mat)
-            obj.matrix = mat;
-        end
-            
-        function point = support(obj,direction)
-            % input direction is a column
-            % output point is a column
-            [~,argmax] = max(obj.matrix * direction);
-            point = obj(:,argmax).';
-        end
+    cross_prod = @(v1,v2) (v1(1)*v2(2)) - (v1(2)*v2(1));
+    tr = cross_prod(v2,v1) /dot_prod;
+    ts = dot(v1,v3)/dot_prod;
+    if (tr >= 0.0 && (ts >= 0.0 && ts <= 1.0))
+        intersects = true;
+    else
+        intersects = false;
     end
 end
