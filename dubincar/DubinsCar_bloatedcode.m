@@ -1,32 +1,33 @@
 clear; close all;
 
-addpath('Bernstein');
-addpath('BeBOT_lib');
+addpath('..\Bernstein');
+addpath('..\BeBOT_lib');
 
 % Settings
 T = 10;
-N = 50;
+N = 20;
 
 % Boundary Conditions
 ang_0 = 0;
 ang_f = 0;
 
-init_conds  = [3 5 cos(ang_0) sin(ang_0) 1 0]; % x y c s v w
-final_conds = [0 0 cos(ang_f) sin(ang_f) 1 0]; % inf <=> don't care
+xi  = [3 5 cos(ang_0) sin(ang_0) 1 0]; % x y c s v w
+xf = [0 0 cos(ang_f) sin(ang_f) 1 0]; % inf <=> don't care
 
 % run
 sols = cell(1,length(N));
 
-%shapes = [  1 1.5 ; 1 2.5 ; 2 2.5 ; 2 1.5 ];
+shapes = [  1 1.5 ; 1 2.5 ; 2 2.5 ; 2 1.5 ];
+shapes = [];
 %nonlcon = @(X,N,T) nonlcon_obstacle(X,N,T,shapes);
 nonlcon = @basicnonlcon;
 
 for i = 1:length(N)
-    [xIn,xOut,dur,Jout,constraints] = run_problem(init_conds,final_conds,N(i),T,nonlcon,@costFunc);
+    [xIn,xOut,dur,Jout,constraints] = run_problem(xi,xf,N(i),T,nonlcon,@costFunc);
     sols{i} = struct('N',N(i),'dur',dur,'xIn',xIn,'xOut',xOut,'Jout',Jout,'constraints',constraints);
 end
 
-% post process
+%% post process
 
 if length(N) ~= 1
     figure(1), sgtitle('x y plane')
@@ -42,10 +43,10 @@ else
     figure(2), title('compare vels')
     figure(3), title('compare angles')
     plotstuff(xOut, N, T,shapes)
-    testconstraints(xOut, T, constraints)
+    %testconstraints(xOut, T, constraints)
 end
 
-% Functions
+%% Functions
 
 % Plot stuff
 function plotstuff(xOut, N, T,shapes,m,n,i)
@@ -159,9 +160,10 @@ function [xIn,xOut,dur,Jout,constraints] = run_problem(xi,xf,N,T,dynamics,costFu
 
     nonlcon=@(x) dynamics(x,xi,xf,N,T);
     
-    xIn = InitialGuess(N,T,xi,xf);
+    xIn = InitialGuess(N);
 
-    options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter','MaxFunctionEvaluations',1000*(N-1)*6);
+    %options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter','MaxFunctionEvaluations',1000*(N-1)*6);
+    options = optimoptions(@fmincon,'Display','Iter','Algorithm','sqp','MaxFunctionEvaluations',300000,'StepTolerance',eps,'MaxIterations',Inf);
 
     tic;
         [xOut,Jout,~,~] = fmincon(@(x)costFunc(x,xi,xf,N,T),xIn,[],[],[],[],[],[],nonlcon,options);
@@ -174,19 +176,12 @@ function [xIn,xOut,dur,Jout,constraints] = run_problem(xi,xf,N,T,dynamics,costFu
 end
 
 % Cost function
-function J = costFunc(X,init_conds,final_conds,N,T)
-
-    [~, ~, ~, ~, ~, ~, ~, ~, v, w]  = getControlPoints(X,init_conds,final_conds,N,T);
-
-    %b_sq_int = @(p) BernsteinIntegr(BernsteinPow(p,2),T);
-
-    cv = 0.1;
-    cw = 20;
-    
-    %J = cw * b_sq_int(w) + cv* b_sq_int(v);
-    J = cv*sum(v.^2)+cw*sum(w.^2);
-    
-
+function J = costFunc(X,xi,xf,N,T)
+    [~, ~, ~, ~, ~, ~, ~, ~, v, w]  = getControlPoints(X,xi,xf,N,T);
+    a = BernsteinDeriv(v,T);
+    ca = 1;
+    cw = 2;
+    J = ca*sum(a.^2)+cw*sum(w.^2);
 end
 
 function [t,xy] = recoverplot(X,T)
@@ -236,13 +231,11 @@ end
 % The nonlinear contraints set the dynamic conditions
 % this function is named "basic" because it doesn't take obstacles into
 % account
-function [c, ceq] = basicnonlcon(X,init_conds,final_conds,N,T)
+function [c, ceq] = basicnonlcon(X,xi,xf,N,T)
 
-    [~, ~, c, s, dx, dy, dc, ds, v, w] = getControlPoints(X,init_conds,final_conds,N,T);
+    [~, ~, c, s, dx, dy, dc, ds, v, w] = getControlPoints(X,xi,xf,N,T);
     
     ceq = [
-        %x - BernsteinAntiDeric(v.*c) + cosntat
-        %BernsteinDegreElev(y,2*N-1) - BernsteinAntiDeriv(BernsteinMul(v,s),T,y(1))
         dx - v.*c
         dy - v.*s
         dc + s.*w
@@ -255,8 +248,8 @@ function [c, ceq] = basicnonlcon(X,init_conds,final_conds,N,T)
 
 end
 
-function [c, ceq] = nonlcon_obstacle(X,init_conds,final_conds,N,T,shapes)
-    [~, ceq] = basicnonlcon(X,init_conds,final_conds,N,T);
+function [c, ceq] = nonlcon_obstacle(X,xi,xf,N,T,shapes)
+    [~, ceq] = basicnonlcon(X,xi,xf,N,T);
 
     if ~isempty(shapes)
         c = zeros(size(shapes,3),1);
@@ -270,24 +263,20 @@ function [c, ceq] = nonlcon_obstacle(X,init_conds,final_conds,N,T,shapes)
 end
 
 % Initial Guess
-function [X] = InitialGuess(N,T,init_conds,final_conds)
+function [X] = InitialGuess(N)
 
-    omg_max = 10*pi/180;
-    vmax = norm(final_conds(1:2)-final_conds(1:2))/T*1.5;
-    vmax = max([init_conds(5), final_conds(5), vmax]);
-    
-    x = max(abs([init_conds(1), final_conds(1)]))*rand(N-1,1);
-    y = max(abs([init_conds(2), final_conds(2)]))*rand(N-1,1);
-    c = rand(N-1,1);
-    s = rand(N-1,1);
-    v = vmax*ones(N-1,1);
-    w = omg_max*2*rand(N-1,1)-omg_max;
+    x = rand(N-1,1);
+    y = rand(N-1,1);
+    c = 2*rand(N-1,1)-1;
+    s = sqrt(1-c.^2);
+    v = ones(N-1,1);
+    w = zeros(N-1,1);
     X = [ x;y;c;s;v;w ];
 
 end
 
 % Get Control Points of Trajectories
-function [px, py, c, s, dx, dy, dc, ds, v, w] = getControlPoints(X,init_conds,final_conds,N,T)
+function [px, py, c, s, dx, dy, dc, ds, v, w] = getControlPoints(X,xi,xf,N,T)
 
     persistent old_N old_T d_mat
     if  isempty(old_N) || isempty(old_T) || old_N ~= N || old_T ~= T
@@ -298,7 +287,7 @@ function [px, py, c, s, dx, dy, dc, ds, v, w] = getControlPoints(X,init_conds,fi
 
     X = reshape(X(:), [], 6);
 
-    X = [ init_conds; X; final_conds ];
+    X = [ xi; X; xf ];
     
     % get control points
     px = X(:,1);

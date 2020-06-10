@@ -6,7 +6,7 @@ figure, hold on
 plot(polyshape(shape1))
 plot(polyshape(shape2))
 
-
+    
 shape3 = shape1;
 shape4 = [ 0 0.5 ; 0.5 1; 1 0.5 ; 0.5 0];
 [dist, pt1, pt2, simplex] = gjk(shape3.', shape4.');
@@ -30,3 +30,5 @@ disp(['collision: ',num2str(simplex.collision),' distance: ',num2str(dist),' >0?
 figure, hold on
 plot(polyshape(shape7))
 plot(polyshape(shape8))
+
+

@@ -3,20 +3,17 @@ function [intersection,simplex] = gjk2(shapeA,shapeB)
 
     %[S,pts] = supportwrapper(shape1,shape2,[1 0].');
     % point is a struct
-    point = supportwrapper(shapeA,shapeB,[1 0].');
-    
-    %simplex = {struct('vert',S,'pts',pts)};
-    simplex = {struct('vert',point)};
-    d = [-1 0].'; 
+    d=[1;0];
+    simplex={supportwrapper(shapeA,shapeB,d)};
 
+    d = -d; 
+    
     while true
-        simplex{end+1} = struct('vert',supportwrapper(shapeA,shapeB,d));
-        %[A,pts] = supportwrapper(shapeA,shapeB,D);
-        if dot(simplex{end}.vert,d) < 0
-            intersection = false;
+        simplex{end+1} = supportwrapper(shapeA,shapeB,d) ; %#ok<AGROW>
+        if(dot(simplex{end}.P,d)<=0)
+            intersection=false;
             break
         end
-        %simplex{end+1} = struct('vert',A,'pts',pts);
         [intersection,simplex,d] = containsorigin(simplex);
         if intersection
             break;
@@ -28,12 +25,12 @@ end
 
 function [intersection,simplex,d] = containsorigin(simplex)
     a = simplex{end};
-    a0 = -a.vert;
+    a0 = -a.P;
     if length(simplex) == 3
         b = simplex{end-1};
         c = simplex{end-2};
-        ab = b.vert - a.vert;
-        ac = c.vert - a.vert;
+        ab = b.P - a.P;
+        ac = c.P - a.P;
         abPerp = tripleProduct(ac,ab,ab);
         acPerp = tripleProduct(ab,ac,ac);
         if dot(abPerp,a0)> 0
@@ -49,24 +46,31 @@ function [intersection,simplex,d] = containsorigin(simplex)
         end
     else
         b = simplex{1};
-        ab = b.vert - a.vert;
+        ab = b.P - a.P;
         abPerp = tripleProduct(ab,a0,ab);
         d = abPerp;
+        if ~any(d)
+            intersection = true;
+            return
+        end
+            
     end
 
     intersection=false;
 end
 
 
-function [diff,pts] = supportwrapper(shapeA,shapeB,D)
+function [point] = supportwrapper(shapeA,shapeB,D)
     % shapeA and shapeB are structs
     % D is a col
-    % A is a col
-    % pts are 2 cols side by side
+    point = struct();
+    point.dir=D;
     ptA = shapeA.support(D);
     ptB = shapeB.support(-D);
-    diff = ptA-ptB;
-    pts = [ ptA,ptB ];
+    point.A=ptA;
+    point.B=ptB;
+    point.P=point.A-point.B;
+    point.mag=sum(point.P.^2,'all');
 end
 
 
@@ -74,6 +78,34 @@ function [vec] = tripleProduct(A,B,C)
     vec = B.*(dot(C,A))-A.*(dot(C,B));
 end
 
+
+function [dist,simplex] = mindist(simplex,shapeA,shapeB)
+    
+    d = closestpointto0(simplex{end}.P,simplex{end-1}.P);
+
+    while true
+        d = -d;
+        c = supportwrapper(shapeA,shapeB,d);
+        dc = dot(c.P,d);
+        da = dot(d,a);
+        if dc-da<10e-6
+            dist = norm(d);
+            return
+        end
+        p1 = closestpointto0(simplex{end}.P,c.P);
+        p2 = closestpointto0(c.P,simplex{end-1},P);
+        
+        if p1(1).^2+p1(2).^2 < p1(1).^2+p2(2)^2
+            simplex{end-1}= c;
+            d = p1;
+        else
+            simplex{end} = c;
+            d = p2;
+        end
+    end
+
+    
+end
 
 function [closestPt, t] = dist2line(A, B)
 %DIST2LINE Finds the closest point on a line segment to the origin.

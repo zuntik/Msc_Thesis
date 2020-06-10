@@ -10,13 +10,22 @@ function vec = directed_epa(support, simplex,d)
     for i = 1:4
         if i == 4
             disp('error, the origin is either on the edge or ouside the simplex');
-        elseif segrayintersect([0;0],d,simplex{i}.vert,simplex{rem(i,3)+1}.vert)
-            A = simplex{i}.vert;
-            B = simplex{rem(i,3)+1}.vert;
+        elseif segrayintersect([0;0],d,simplex{i}.P,simplex{rem(i,3)+1}.P)
+            A = simplex{i}.P;
+            B = simplex{rem(i,3)+1}.P;
             break
         end
     end
-        
+    
+    % if oritentation > 0 clockwise, elseif 0 colinear else anticlockwise
+    orientation = @(p1,p2,p3) (p2(2)-p1(2))*(p3(1)-p2(1))-(p2(1)-p1(1))*(p3(2)-p2(2));
+    if orientation(A,B,[0 0]) <= 0
+        % swap
+        A = A+B;
+        B = A-B;
+        A = A-B;
+    end
+    
     tripleProduct = @(A,B,C) B.*(dot(C,A))-A.*(dot(C,B));
     while true
         e = B-A;

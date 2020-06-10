@@ -38,21 +38,24 @@ allcosines(argymin)=-2;
 % A = [ A(1:argymin-1,:); bottomleftmost; A(argymin:end,:)];
 % downtoA = [downtoA(1:argymin-1,:); [0 0]; downtoA(argymin:end,:)];
 
-[uniquecosines,~,iccosines] = unique(allcosines);
+[~,iacosines,~] = uniquetol(allcosines);
+uniquecosines = allcosines(sort(iacosines),:);
 
 candidates = zeros(size(A,1),1);
 
 for i = 1:length(uniquecosines)
-    indexes = find(iccosines==i);
-    [~,argmaxnorm] = max(norms_squared(indexes));
+    indexes = abs(allcosines-uniquecosines(i))<10e-6;
+    [~,argmaxnorm] = max(norms_squared(indexes==1));
+    indexes = find(indexes);
     candidates(indexes(argmaxnorm))=1;
 end
 
 % now sort!
 % notice the bottom left point will most definitely be first on the list
+uniquecosines = allcosines(candidates==1,:);
 [~,sortedpos] = sort(uniquecosines);
 
-A =A(find(candidates),:);
+A =A(candidates==1,:);
 
 if length(uniquecosines) <3
     indexes=ones(length(uniquecosines),1);
@@ -105,14 +108,16 @@ indexes = recoverindexes(indexes,candidates,ic,ia);
 function indexes = recoverindexes(indexes,candidates,ic,ia)
     % bring back the points with same cosine
     id = indexes;
-    indexes = zeros(nnz(candidates),1);
-    indexes(find(candidates)) = id;
+    indexes = zeros(size(candidates,1),1);
+    indexes(candidates==1) = id;
 
     % bring back the repeated points
     id = indexes;
     % assume that duplicated points do not belong in the convex hull
-    indexes = zeros(length(ic),1);
-    indexes(ia) = id;
+%     indexes = zeros(length(ic),1);
+%     indexes(ia) = id;
+    indexes = false(length(ic),1);
+    indexes(ia) = id==1;
 end
 
 end
