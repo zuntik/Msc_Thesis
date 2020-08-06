@@ -45,6 +45,9 @@ if ~isempty(intersectpoints)
     dist = -1;
 end
 
+if m == 2
+    pt = pt(1:2,:);
+end
 
 end
 
@@ -64,7 +67,12 @@ if count > 1000
 end
 
 % if all of the control points are in the polygon, no min and no intersect
-if iscontained(poly.',cpts.')
+% if iscontained(poly.',cpts.')
+%     intersectpoints=[]; pt = []; t = []; alpha = [];
+%     return
+% end
+[cpts_in_obs,cpts_edge_obs] = inpolygon(cpts(1,:),cpts(2,:),poly(1,:),poly(2,:));
+if all(cpts_in_obs) && ~any(cpts_edge_obs)
     intersectpoints=[]; pt = []; t = []; alpha = [];
     return
 end
@@ -187,7 +195,7 @@ if simplex.len >= 4
 end
 
 % Find the index of where the simplex vertices are in cpts
-approx = @(x, y) abs(x-y) < 10000*eps; 
+approx = @(x, y) abs(x-y) < 1000000*eps; 
 idx = zeros(1, simplex.len);
 for i = 1:simplex.len
     idx(i) = find(all(bsxfun(approx, cpts, vertices{i}(:, 1)), 1), 1)-1;
