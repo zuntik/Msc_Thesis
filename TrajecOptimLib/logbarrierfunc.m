@@ -1,5 +1,7 @@
-function val = logbarrierfunc(delta,z)
-    z = my_sigma(z);
+function val = logbarrierfunc(delta,z,usesigma)
+    if usesigma
+        z = my_sigma(z);
+    end
     k = 2;
     if z>delta
         val = - log(z);
@@ -9,7 +11,7 @@ function val = logbarrierfunc(delta,z)
     end
 end
 
-function val = my_sigma(z) %#ok<DEFNU>
+function val = my_sigma(z)
     if z >= 0
         val = tanh(z);
     else
