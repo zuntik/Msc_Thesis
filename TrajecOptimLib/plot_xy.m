@@ -1,9 +1,9 @@
 function plot_xy(X,CONSTANTS)
 
-    figure, axis equal, hold on
+    figure, axis equal, hold on, axis ij,camroll(90)
     for i = 1:CONSTANTS.Nv
-        BernsteinPlot(X(:,1:2,i),CONSTANTS.T);
-        [~,xy] = CONSTANTS.recoverxy(X(:,:,i),CONSTANTS.T);
+        BernsteinPlot(X(:,1:2,i),CONSTANTS.T,'PlotControlPoints',false);
+        [~,xy] = CONSTANTS.recoverxy(X(:,:,i),CONSTANTS);
         plot(xy(:,1),xy(:,2));
     end
 

@@ -6,7 +6,15 @@ addpath('..\TrajecOptimLib');
 
 % parameters
 
-% 1 vehicle no constraints
+% % 1 vehicle no constraints
+
+CONSTANTS.T = 10;
+CONSTANTS.xi = [ 0 0 0 1 0];
+CONSTANTS.xf = [ 5 5 pi/2 1 0];
+CONSTANTS.N = 30;
+CONSTANTS.obstacles = [];
+CONSTANTS.obstacles_circles = [];
+
 % CONSTANTS.T = 15; % time
 % CONSTANTS.xi = [5 3 0 1 0]; % x y psi v w
 % CONSTANTS.xf = [0 0 0 1 0]; % x y psi v w
@@ -21,35 +29,35 @@ addpath('..\TrajecOptimLib');
 % CONSTANTS.obstacles = [];
 % CONSTANTS.obstacles_circles = [];
 
-% 1 vehicle 1 obstacle
-CONSTANTS.T = 15;
-CONSTANTS.xi = [5 3 0 1 0];
-CONSTANTS.xf = [0 0 0 1 0];
-CONSTANTS.obstacles = [  1 1 ; 1 2 ; 2 2 ; 2 1 ] + [100 100];
-CONSTANTS.obstacles_circles = [];
-CONSTANTS.N = 13;
+% % 1 vehicle 1 obstacle
+% CONSTANTS.T = 15;
+% CONSTANTS.xi = [5 3 0 1 0];
+% CONSTANTS.xf = [0 0 0 1 0];
+% CONSTANTS.obstacles = [  1 1 ; 1 2 ; 2 2 ; 2 1 ] + [100 100];
+% CONSTANTS.obstacles_circles = [];
+% CONSTANTS.N = 13;
 
-CONSTANTS.T = 10;
-CONSTANTS.xi = [ -5 0 0 1 0];
-CONSTANTS.xf = [  5 0 0 1 0];
-CONSTANTS.N = 13;
-CONSTANTS.obstacles = [ -0.5 -0.5; -0.5 0.5; 0.5 0.5; 0.5 -0.5 ];
-CONSTANTS.obstacles_circles = [];
+% CONSTANTS.T = 10;
+% CONSTANTS.xi = [ -5 0 0 1 0];
+% CONSTANTS.xf = [  5 0 0 1 0];
+% CONSTANTS.N = 13;
+% CONSTANTS.obstacles = [ -0.5 -0.5; -0.5 0.5; 0.5 0.5; 0.5 -0.5 ];
+% CONSTANTS.obstacles_circles = [];
 
-% 2 vehicles no obstacles
-CONSTANTS.T = 15;
-CONSTANTS.xi = [
-    0 5 0 1 0
-    5 0 pi/2 1 0
-];
-CONSTANTS.xf = [
-    10 5 0 1 0
-    5 10 pi/2 1 0 
-];
-CONSTANTS.obstacles = [];
-CONSTANTS.obstacles_circles = [];
+% % 2 vehicles no obstacles
+% CONSTANTS.T = 15;
+% CONSTANTS.xi = [
+%     0 5 0 1 0
+%     5 0 pi/2 1 0
+% ];
+% CONSTANTS.xf = [
+%     10 5 0 1 0
+%     5 10 pi/2 1 0 
+% ];
+% CONSTANTS.obstacles = [];
+% CONSTANTS.obstacles_circles = [];
 
-% 3 vehicles 1 circle obstacle
+% % 3 vehicles 1 circle obstacle
 % CONSTANTS.T = 20;
 % CONSTANTS.xi = [
 %     -10 4 0 1 0
@@ -88,6 +96,8 @@ CONSTANTS.recoverxy = @recoverplot;
 %%% run
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 xOut = run_problem(CONSTANTS);
+
+%%
 constraint_evaluation(xOut,CONSTANTS);
 plot_xy(xOut,CONSTANTS);
 
@@ -107,12 +117,12 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [t,xy] = recoverplot(X,T)
+function [t,xy] = recoverplot(X,CONSTANTS)
 
-    v = @(t) BernsteinEval(X(:,4),T,t);
-    w = @(t) BernsteinEval(X(:,5),T,t);
+    v = @(t) BernsteinEval(X(:,4),CONSTANTS.T,t);
+    w = @(t) BernsteinEval(X(:,5),CONSTANTS.T,t);
     
-    [t,xy] = ode45(@(t,xy)odefunc(t,xy,v,w), [0 T], X(1,1:3));
+    [t,xy] = ode45(@(t,xy)odefunc(t,xy,v,w), [0 CONSTANTS.T], X(1,1:3));
 
     function dydt = odefunc(t,y,v,w)
 
@@ -144,6 +154,7 @@ function [c,ceq] = dynamics5vars(X,CONSTANTS)
     %c = [-v+0.2;psi-pi;-psi-pi]; % this one is venanzio's
     %c = [ -v; psi-pi-pi/3; -psi-pi-pi/3];
     c = -v + 0.2 ;
+    %c = CONSTANTS.maxtorque- Xout(:,8);
     
 end
 
@@ -169,10 +180,11 @@ function xinit = init_guess(CONSTANTS)
         w = zeros(N-1,1);
         xinit(:,:,i) = [x,y,psi,v,w];
     end
-
+    xinit = xinit(:);
+    
 end
 
-function xinit = bad_init_guess(CONSTANTS) %#ok<*DEFNU>
+function xinit = rand_init_guess(CONSTANTS) %#ok<*DEFNU>
 
     N = CONSTANTS.N; 
 
@@ -183,6 +195,6 @@ function xinit = bad_init_guess(CONSTANTS) %#ok<*DEFNU>
     w = rand(N-1,1);
 
     xinit = [x;y;psi;v;w];
+    xinit = xinit(:);
     
 end
-
