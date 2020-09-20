@@ -17,14 +17,14 @@ function [c,ceq] = nonlcon(X,CONSTANTS)
     c = [c; cell2mat(c_dyn)];
     
     % obstacles
-    if ~isempty(CONSTANTS.obstacles) && ~CONSTANTS.uselogbar
+    if ~isempty(CONSTANTS.obstacles)% && ~CONSTANTS.uselogbar
         c_env_avoidance = cell(CONSTANTS.Nv,1);
         for i = 1:CONSTANTS.Nv
             c_env_avoidance{i} = env_collision_avoidance(X(:,:,i),CONSTANTS);
         end    
         c = [c; cell2mat(c_env_avoidance)];
     end
-    if ~isempty(CONSTANTS.obstacles_circles) && ~CONSTANTS.uselogbar
+    if ~isempty(CONSTANTS.obstacles_circles)% && ~CONSTANTS.uselogbar
         c_env_avoidance = cell(CONSTANTS.Nv,1);
         for i = 1:CONSTANTS.Nv
             c_env_avoidance{i} = env_collision_avoidance_circles(X(:,:,i),CONSTANTS);
@@ -33,7 +33,7 @@ function [c,ceq] = nonlcon(X,CONSTANTS)
     end
 
     % inter vehicles
-    if CONSTANTS.Nv>1 && ~CONSTANTS.uselogbar
+    if CONSTANTS.Nv>1% && ~CONSTANTS.uselogbar
         c_vehicle_avoidance = cell(nchoosek(CONSTANTS.Nv,2),1);
         it = 1;
         for i = 1:CONSTANTS.Nv

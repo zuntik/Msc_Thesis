@@ -6,14 +6,15 @@ addpath('..\TrajecOptimLib');
 
 % parameters
 
-% % 1 vehicle no constraints
+% 1 vehicle no constraints
 
 CONSTANTS.T = 10;
 CONSTANTS.xi = [ 0 0 0 1 0];
 CONSTANTS.xf = [ 5 5 pi/2 1 0];
-CONSTANTS.N = 30;
+CONSTANTS.N = 15;
 CONSTANTS.obstacles = [];
 CONSTANTS.obstacles_circles = [];
+%CONSTANTS.obstacles_circles = [5,0,3];
 
 % CONSTANTS.T = 15; % time
 % CONSTANTS.xi = [5 3 0 1 0]; % x y psi v w
@@ -29,7 +30,7 @@ CONSTANTS.obstacles_circles = [];
 % CONSTANTS.obstacles = [];
 % CONSTANTS.obstacles_circles = [];
 
-% % 1 vehicle 1 obstacle
+% 1 vehicle 1 obstacle
 % CONSTANTS.T = 15;
 % CONSTANTS.xi = [5 3 0 1 0];
 % CONSTANTS.xf = [0 0 0 1 0];
@@ -44,7 +45,8 @@ CONSTANTS.obstacles_circles = [];
 % CONSTANTS.obstacles = [ -0.5 -0.5; -0.5 0.5; 0.5 0.5; 0.5 -0.5 ];
 % CONSTANTS.obstacles_circles = [];
 
-% % 2 vehicles no obstacles
+% 2 vehicles no obstacles
+% CONSTANTS.N = 30;
 % CONSTANTS.T = 15;
 % CONSTANTS.xi = [
 %     0 5 0 1 0
@@ -57,8 +59,9 @@ CONSTANTS.obstacles_circles = [];
 % CONSTANTS.obstacles = [];
 % CONSTANTS.obstacles_circles = [];
 
-% % 3 vehicles 1 circle obstacle
-% CONSTANTS.T = 20;
+% 3 vehicles 1 circle obstacle
+% CONSTANTS.N = 40;
+% CONSTANTS.T = 15;
 % CONSTANTS.xi = [
 %     -10 4 0 1 0
 %     -10 -4 0 1 0
@@ -69,19 +72,18 @@ CONSTANTS.obstacles_circles = [];
 %     10 1 0 1 0
 %     10 0 0 1 0
 % ];
-% CONSTANTS.T = 15;
 % CONSTANTS.obstacles = [];
 % CONSTANTS.obstacles_circles = [ 0 0 3]; % x y r
 
 % common parameters
-CONSTANTS.min_dist_intervehicles = 3;
+CONSTANTS.min_dist_intervehicles = .9;
 CONSTANTS.DiffMat = BernsteinDerivElevMat(CONSTANTS.N,CONSTANTS.T);
 CONSTANTS.EvalMat = BernsteinCtrlPntsEval(CONSTANTS.N);
 CONSTANTS.BigElevMat = BernsteinDegrElevMat(CONSTANTS.N,CONSTANTS.N*10);
 CONSTANTS.numvars = size(CONSTANTS.xi,2);
 CONSTANTS.numinputs = 0;
 CONSTANTS.Nv = size(CONSTANTS.xi,1);%number of vehicles
-CONSTANTS.uselogbar = false; % use log barrier func
+CONSTANTS.uselogbar = true; % use log barrier func
 CONSTANTS.usesigma = true; % a variable for the usage of log barrier func
 
 % functions
@@ -95,10 +97,11 @@ CONSTANTS.recoverxy = @recoverplot;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-xOut = run_problem(CONSTANTS);
+[xOut,JOut] = run_problem(CONSTANTS);
 
+disp(['The final cost is ', num2str(JOut)])
 %%
-constraint_evaluation(xOut,CONSTANTS);
+%constraint_evaluation(xOut,CONSTANTS);
 plot_xy(xOut,CONSTANTS);
 
 if CONSTANTS.Nv == 2
@@ -113,6 +116,7 @@ if ~isempty(CONSTANTS.obstacles_circles) && size(CONSTANTS.obstacles_circles,3) 
     figure, grid on
     BernsteinPlot(sum((xOut(:,1:2)-CONSTANTS.obstacles_circles(1:2)).^2,2),CONSTANTS.T);
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% functions
@@ -135,6 +139,7 @@ function [t,xy] = recoverplot(X,CONSTANTS)
 
 end
 
+
 function [c,ceq] = dynamics5vars(X,CONSTANTS)
 
     DiffMat = CONSTANTS.DiffMat;
@@ -153,24 +158,26 @@ function [c,ceq] = dynamics5vars(X,CONSTANTS)
     %c=[-v+0.8;v-1.2 ;psi-pi;-psi-pi];
     %c = [-v+0.2;psi-pi;-psi-pi]; % this one is venanzio's
     %c = [ -v; psi-pi-pi/3; -psi-pi-pi/3];
-    c = -v + 0.2 ;
+    %c = -v + 0.2 ;
+    c = [];
     %c = CONSTANTS.maxtorque- Xout(:,8);
     
 end
+
 
 function J = costfun_single(X,CONSTANTS)
     v = X(:,4);
     w = X(:,5);
     a = CONSTANTS.DiffMat*v;
     J = sum(a.^2)+2*sum(w.^2);
-    
 end
+
 
 function xinit = init_guess(CONSTANTS)
 
     N = CONSTANTS.N; 
 
-    xinit = zeros(CONSTANTS.N-1,CONSTANTS.numvars,CONSTANTS.Nv);
+    xinit = zeros((CONSTANTS.N-1)*CONSTANTS.numvars,CONSTANTS.Nv);
     for i = 1:CONSTANTS.Nv
         x = linspace(CONSTANTS.xi(i,1),CONSTANTS.xf(i,1),N-1).';
         y = linspace(CONSTANTS.xi(i,2),CONSTANTS.xf(i,2),N-1).';
@@ -178,11 +185,12 @@ function xinit = init_guess(CONSTANTS)
         psi = ones(N-1,1).*atan2(y(end)-y(1),x(end)-x(1));
         v = ones(N-1,1);
         w = zeros(N-1,1);
-        xinit(:,:,i) = [x,y,psi,v,w];
+        xinit(:,i) = [x;y;psi;v;w];
     end
-    xinit = xinit(:);
+    %xinit = xinit(:);
     
 end
+
 
 function xinit = rand_init_guess(CONSTANTS) %#ok<*DEFNU>
 

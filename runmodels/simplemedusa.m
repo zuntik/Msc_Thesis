@@ -56,14 +56,31 @@ CONSTANTS.MODELPARAMS=MODELPARAMS;
 %%% runtime parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 1 vehicle no constraints
-CONSTANTS.T = 15; % time
-CONSTANTS.xi = [0 0 0    1 0 0]; % x y yaw u v r
-%CONSTANTS.xf = [5 5 pi/2 1 0 0]; % x y yaw u v r
-CONSTANTS.xf = [5 2 pi/6 1 0 0];
-CONSTANTS.N = 50; % order
+% % 1 vehicle no constraints
+% CONSTANTS.T = 15; % time
+% CONSTANTS.xi = [0 0 0    1 0 0]; % x y yaw u v r
+% %CONSTANTS.xf = [5 5 pi/2 1 0 0]; % x y yaw u v r
+% CONSTANTS.xf = [5 2 pi/6 1 0 0];
+% CONSTANTS.N = 50; % order
+% CONSTANTS.obstacles = [];
+% CONSTANTS.obstacles_circles = [];% = surroundhull(CONSTANTS.obstacles);
+
+% 3 vehicles 1 circle obstacle
+CONSTANTS.N = 40;
+CONSTANTS.T = 20;
+CONSTANTS.xi = [
+    -10 4 0 1 0 0
+%     -10 -4 0 1 0 0
+%     -10 0 0 1 0 0
+];
+CONSTANTS.xf = [
+    10 -1 0 1 0 0
+%     10 1 0 1 0 0
+%     10 0 0 1 0 0
+];
+CONSTANTS.T = 15;
 CONSTANTS.obstacles = [];
-CONSTANTS.obstacles_circles = [];% = surroundhull(CONSTANTS.obstacles);
+CONSTANTS.obstacles_circles = [ 0 0 3]; % x y r
 
 
 % common parameters
@@ -246,7 +263,7 @@ function xinit = init_guess(CONSTANTS)
 
     N = CONSTANTS.N; 
 
-    xinit = zeros(CONSTANTS.N-1,CONSTANTS.numvars,CONSTANTS.Nv);
+    xinit = zeros((CONSTANTS.N-1)*CONSTANTS.numvars,CONSTANTS.Nv);
     for i = 1:CONSTANTS.Nv
         x = linspace(CONSTANTS.xi(i,1),CONSTANTS.xf(i,1),N-1).';
         y = linspace(CONSTANTS.xi(i,2),CONSTANTS.xf(i,2),N-1).';
@@ -254,10 +271,10 @@ function xinit = init_guess(CONSTANTS)
         u = ones(N-1,1);
         v = zeros(N-1,1);
         r = zeros(N-1,1);
-        xinit(:,:,i) = [x,y,yaw,u,v,r];
+        xinit(:,i) = [x;y;yaw;u;v;r];
     end
-    xinit = xinit(:);
-    xinit = [xinit ; rand((CONSTANTS.N+1)*CONSTANTS.numinputs*CONSTANTS.Nv,1)];
+    %xinit = xinit(:);
+    xinit = [xinit ; rand((CONSTANTS.N+1)*CONSTANTS.numinputs,CONSTANTS.Nv)];
 
 end
 
