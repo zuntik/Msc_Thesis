@@ -4,3 +4,7 @@ slprj
 *.mat
 *.asv
 figs/
+
+
+__pycache__/
+.idea
