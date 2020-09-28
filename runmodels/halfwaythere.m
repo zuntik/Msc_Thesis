@@ -58,31 +58,13 @@ CONSTANTS.MODELPARAMS=MODELPARAMS;
 
 % % 1 vehicle no constraints
 CONSTANTS.T = 15; % time
-CONSTANTS.xi = [0 0 0    1 0 0]; % x y yaw u v r
-%CONSTANTS.xf = [5 5 pi/2 1 0 0]; % x y yaw u v r
-% CONSTANTS.xf = [5 2 pi/6 1 0 0];
-CONSTANTS.xf = [ 15 0 0 1 0 0 ];
+CONSTANTS.xi = [0 0 0    1 0]; % x y yaw u r
+%CONSTANTS.xf = [5 5 pi/2 1 0]; % x y yaw u r
+% CONSTANTS.xf = [5 2 pi/6 1 0];
+CONSTANTS.xf = [ 15 0 0 1 0 ];
 CONSTANTS.N = 30; % order
 CONSTANTS.obstacles = [];
 CONSTANTS.obstacles_circles = [];% = surroundhull(CONSTANTS.obstacles);
-
-% 3 vehicles 1 circle obstacle
-% CONSTANTS.N = 40;
-% CONSTANTS.T = 20;
-% CONSTANTS.xi = [
-%     -10 4 0 1 0 0
-% %     -10 -4 0 1 0 0
-% %     -10 0 0 1 0 0
-% ];
-% CONSTANTS.xf = [
-%     10 -1 0 1 0 0
-% %     10 1 0 1 0 0
-% %     10 0 0 1 0 0
-% ];
-% CONSTANTS.T = 15;
-% CONSTANTS.obstacles = [];
-% %CONSTANTS.obstacles_circles = [ 0 0 3]; % x y r
-% CONSTANTS.obstacles_circles = [];
 
 % common parameters
 CONSTANTS.min_dist_intervehicles = 3;
@@ -97,11 +79,9 @@ CONSTANTS.usesigma = true; % a variable for the usage of log barrier func
 
 % functions
 CONSTANTS.costfun_single = @costfun_single;
-CONSTANTS.dynamics = @dynamicsmedusa;
-CONSTANTS.init_guess = @init_guess;
+CONSTANTS.dynamics = @dynamics;
+CONSTANTS.init_guess = @rand_init_guess;
 CONSTANTS.recoverxy = @recoverplot;
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run
@@ -136,62 +116,43 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [t,xy] = recoverplot(X,CONSTANTS)
 
-    tau_u = @(t) BernsteinEval(X(:,7),CONSTANTS.T,t);
-    tau_r = @(t) BernsteinEval(X(:,8),CONSTANTS.T,t);
+    tau_u = @(t) BernsteinEval(X(:,6),CONSTANTS.T,t);
+    tau_r = @(t) BernsteinEval(X(:,7),CONSTANTS.T,t);
     
-    [t,xy] = ode45(@(t,xy)odefunc(t,xy,tau_u,tau_r,CONSTANTS.MODELPARAMS), [0 CONSTANTS.T], X(1,1:6));
+    [t,xy] = ode45(@(t,xy)odefunc(t,xy,tau_u,tau_r,CONSTANTS.MODELPARAMS), [0 CONSTANTS.T], X(1,1:5));
 
     function dydt = odefunc(t,y,tau_u,tau_r,MODELPARAMS)
 
         % load the parameters
         %%%%%% Coefficients
-%         mass = MODELPARAMS.mass;
-%         I_z = MODELPARAMS.I_z;
-%         X_dot_u = MODELPARAMS.X_dot_u;
-%         Y_dot_v = MODELPARAMS.Y_dot_v;
-%         N_dot_r = MODELPARAMS.N_dot_r;
         X_u = MODELPARAMS.X_u;
-        Y_v = MODELPARAMS.Y_v;
         N_r = MODELPARAMS.N_r;
         X_uu = MODELPARAMS.X_uu;
-        Y_vv = MODELPARAMS.Y_vv;
         N_rr = MODELPARAMS.N_rr;
 
         %%%%%% masses
         m_u = MODELPARAMS.m_u;
-        m_v = MODELPARAMS.m_v;
         m_r = MODELPARAMS.m_r;
-        m_uv = MODELPARAMS.m_uv;
-
-        %%%%%% Constants
-        fu = MODELPARAMS.fu;
-        fv = MODELPARAMS.fv;
-        fr = MODELPARAMS.fr;
-        Vcx = MODELPARAMS.Vcx;
-        Vcy = MODELPARAMS.Vcy;
 
         yaw = y(3);
         u = y(4);
-        v = y(5);
-        r = y(6);
+        r = y(5);
 
         %%%%%%%%% drag
         d_u = -X_u - X_uu*abs(u);
-        d_v = -Y_v - Y_vv*abs(v);
         d_r = -N_r - N_rr*abs(r);
 
-        dydt = zeros(6,1);
-        dydt(1) = u*cos(yaw) - v*sin(yaw) + Vcx; %dx
-        dydt(2) = u*sin(yaw) + v*cos(yaw) + Vcy; % dy
+        dydt = zeros(5,1);
+        dydt(1) = u*cos(yaw); %dx
+        dydt(2) = u*sin(yaw); % dy
         dydt(3) = r; % dyaw
-        dydt(4) = 1/m_u*(tau_u(t) + m_v*v*r - d_u*u+fu); %du
-        dydt(5) = 1/m_v*(-m_u*u*r - d_v*v+fv); % dv
-        dydt(6) = 1/m_r*(tau_r(t) + m_uv*u*v - d_r*r+fr); % dr  
+        dydt(4) = 1/m_u*(tau_u(t) - d_u*u); %du
+        dydt(5) = 1/m_r*(tau_r(t) - d_r*r); % dr  
     end
 
 end
 
-function [c,ceq] = dynamicsmedusa(X,CONSTANTS)
+function [c,ceq] = dynamics(X,CONSTANTS)
 
     DiffMat = CONSTANTS.DiffMat;
     
@@ -200,11 +161,10 @@ function [c,ceq] = dynamicsmedusa(X,CONSTANTS)
     y = X(:,2);
     yaw = X(:,3);
     u = X(:,4);
-    v = X(:,5);
-    r = X(:,6);
+    r = X(:,5);
     % inputs
-    tau_u = X(:,7);
-    tau_r = X(:,8); 
+    tau_u = X(:,6);
+    tau_r = X(:,7); 
 
     % load the parameters
     %%%%%% Coefficients
@@ -214,86 +174,36 @@ function [c,ceq] = dynamicsmedusa(X,CONSTANTS)
 %     Y_dot_v = CONSTANTS.MODELPARAMS.Y_dot_v;
 %     N_dot_r = CONSTANTS.MODELPARAMS.N_dot_r;
     X_u = CONSTANTS.MODELPARAMS.X_u;
-    Y_v = CONSTANTS.MODELPARAMS.Y_v;
     N_r = CONSTANTS.MODELPARAMS.N_r;
     X_uu = CONSTANTS.MODELPARAMS.X_uu;
-    Y_vv = CONSTANTS.MODELPARAMS.Y_vv;
     N_rr = CONSTANTS.MODELPARAMS.N_rr;
 
     %%%%%% masses
     m_u = CONSTANTS.MODELPARAMS.m_u;
-    m_v = CONSTANTS.MODELPARAMS.m_v;
     m_r = CONSTANTS.MODELPARAMS.m_r;
-    m_uv = CONSTANTS.MODELPARAMS.m_uv;
-
-    %%%%%% Constants
-    fu = CONSTANTS.MODELPARAMS.fu;
-    fv = CONSTANTS.MODELPARAMS.fv;
-    fr = CONSTANTS.MODELPARAMS.fr;
-    Vcx = CONSTANTS.MODELPARAMS.Vcx;
-    Vcy = CONSTANTS.MODELPARAMS.Vcy;
 
     %%%%%%%%% drag
     d_u = -X_u - X_uu*abs(u);
-    d_v = -Y_v - Y_vv*abs(v);
     d_r = -N_r - N_rr*abs(r);
 
     %%%%%%%%% Dynamics
     ceq = [
-%         DiffMat*x - u.*cos(yaw) - v.*sin(yaw) + Vcx;
-%         DiffMat*y - u.*sin(yaw) + v.*cos(yaw) + Vcy;
-        DiffMat*x - u.*cos(yaw) + v.*sin(yaw) - Vcx;
-        DiffMat*y - u.*sin(yaw) - v.*cos(yaw) - Vcy;
+        DiffMat*x - u.*cos(yaw);
+        DiffMat*y - u.*sin(yaw);
         DiffMat*yaw - r;
-        DiffMat*u - 1/m_u*(tau_u + m_v*v.*r - d_u.*u+fu);
-        DiffMat*v - 1/m_v*(-m_u*u.*r - d_v.*v+fv);
-        DiffMat*r - 1/m_r*(tau_r + m_uv*u.*v - d_r.*r+fr);
-    ];
-%     ceq = [
-%         DiffMat*x - u.*cos(yaw) + v.*sin(yaw) - Vcx;
-%         DiffMat*y - u.*sin(yaw) - v.*cos(yaw) - Vcy;
-%         DiffMat*yaw - r;
-%         DiffMat*u + 1/m_u*(-m_v.*v.*r+d_u-tau_u-fu);
-%         DiffMat*v + 1/m_v*(m_u.*u.*r+d_v.*v-fv);
-%         DiffMat*r + 1/m_r*(-m_uv.*u.*v+d_r.*r-tau_r-fr); 
-%     ];
-    
+        DiffMat*u - 1/m_u*(tau_u - d_u.*u);
+        DiffMat*r - 1/m_r*(tau_r - d_r.*r);
+    ];   
 
     c = [];
     
 end
 
 function J = costfun_single(X,CONSTANTS) 
-%     v = X(:,4);
-%     w = X(:,5);
-%     a = CONSTANTS.DiffMat*v;
-%     J = sum(a.^2)+2*sum(w.^2);
-%     J = sum(X(:,7).^2)+2*sum(X(:,6).^2);
-    J = sum(X(:,7).^2)+sum(X(:,8).^2);
-end
-
-function xinit = init_guess(CONSTANTS)
-
-    N = CONSTANTS.N; 
-
-    xinit = zeros((CONSTANTS.N-1)*CONSTANTS.numvars,CONSTANTS.Nv);
-    for i = 1:CONSTANTS.Nv
-        x = linspace(CONSTANTS.xi(i,1),CONSTANTS.xf(i,1),N-1).';
-        y = linspace(CONSTANTS.xi(i,2),CONSTANTS.xf(i,2),N-1).';
-        yaw = ones(N-1,1).*atan2(y(end)-y(1),x(end)-x(1));
-        u = ones(N-1,1);
-        v = zeros(N-1,1);
-        r = zeros(N-1,1);
-        xinit(:,i) = [x;y;yaw;u;v;r];
-    end
-    %xinit = xinit(:);
-    xinit = [xinit ; rand((CONSTANTS.N+1)*CONSTANTS.numinputs,CONSTANTS.Nv)];
-
+    J = sum(X(:,6).^2)+sum(X(:,7).^2);
 end
 
 function xinit = rand_init_guess(CONSTANTS) %#ok<*DEFNU>
     xinit = rand((CONSTANTS.numvars*(CONSTANTS.N-1)+...
-        CONSTANS.numinputs*(CONSTANTS.N+1))*CONSTANTS.Nv,1);
+        CONSTANTS.numinputs*(CONSTANTS.N+1))*CONSTANTS.Nv,1);
 end
-
-
