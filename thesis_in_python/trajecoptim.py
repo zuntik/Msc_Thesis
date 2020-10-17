@@ -111,6 +111,8 @@ def processconstants(constants_orig):
     constants.setdefault('statebounds', None)
     constants.setdefault('inputbounds', None)
     constants.setdefault('numinputs', None)
+    constants.setdefault('uselogbar', False)
+    constants.setdefault('usesigma', True)
     return constants
 
 

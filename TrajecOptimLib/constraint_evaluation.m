@@ -1,9 +1,10 @@
-function constraint_evaluation(X,CONSTANTS)
-
-    Xvars = X(2:end-1,1:CONSTANTS.numvars,:);
-    Xinputs = X(:,CONSTANTS.numvars+1:end,:);
+function constraint_evaluation(X,constants)
+    
+    constants = processconstants(constants);
+    Xvars = X(2:end-1,1:constants.numvars,:);
+    Xinputs = X(:,constants.numvars+1:end,:);
     X = [ Xvars(:);Xinputs(:)];
-    [c,ceq] = nonlcon(X(:),CONSTANTS);
+    [c,ceq] = nonlcon(X(:),constants);
     disp((c<0).')
     disp(norm(ceq))
     disp(ceq.')

@@ -1,4 +1,4 @@
-addpath('Bernstein');
+addpath('..\Bernstein');
 
 T = 6;
 rho = 0.1;

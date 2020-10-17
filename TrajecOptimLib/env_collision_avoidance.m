@@ -1,12 +1,12 @@
-function c = env_collision_avoidance(X,CONSTANTS)
+function c = env_collision_avoidance(X,constants)
 
     c = [];
-    if isempty(CONSTANTS.obstacles) 
+    if isempty(constants.obstacles) 
         return
     end
-    c = zeros(2,size(CONSTANTS.obstacles,3));
-    for i = 1:size(CONSTANTS.obstacles,3)
-        obstacle = CONSTANTS.obstacles(:,:,i);
+    c = zeros(2,size(constants.obstacles,3));
+    for i = 1:size(constants.obstacles,3)
+        obstacle = constants.obstacles(:,:,i);
         [dist, t, pt] = MinDistBernstein2Polygon_extended(X(:,1:2).', obstacle.');
         if dist>0 || length(t) == 1
             c(:,i) = [ -1; -1];

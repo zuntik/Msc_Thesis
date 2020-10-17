@@ -40,7 +40,7 @@ fplot(pd,[0 4]);
 
 %speed
 
-[t,y] = ode45(@(t,y) ad(t) - Kv * (y-vd(t)));
+[t,y] = ode45(@(t,y) ad(t) - Kv * (y-vd(t)), [0 4],vd(0));
 figure, hold on
 plot(t,y);
 fplot(vd,[0 4]);
