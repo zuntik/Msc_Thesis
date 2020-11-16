@@ -1,5 +1,0 @@
-1º simulink
-2º confimrar valores numericos
-3º limitaçoes de atuaçao
-4º funcional custo: dividir cada variável por máximo do modulo expectável
-5º verificar drags

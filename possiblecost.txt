@@ -1,3 +1,0 @@
-Potência:
-integral de (forca*vel + torque*velang)
-limitar forcas 

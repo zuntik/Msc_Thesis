@@ -22,6 +22,10 @@ function c = env_collision_avoidance(X,constants)
             p1 = ConvexPolygon(obstacle);
             [~,~,simplex] = gjk2D(p1,p2,'collcheckonly',true);
             support=@(d) p1.support(d)-p2.support(-d);
+            if isempty(simplex)
+                c(:,i) = [ -1; -1];
+                continue
+            end
             vec_up = directed_epa(support, simplex, [0;1]);
             %vec_side = directed_epa(support, simplex, [1;0]);
             %c(:,i) = [vec_up(2); vec_side(1)];

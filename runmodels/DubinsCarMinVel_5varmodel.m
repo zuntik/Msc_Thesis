@@ -8,43 +8,47 @@ addpath('..\TrajecOptimLib');
 
 % 1 vehicle no constraints
 
-constants.T = 10;
-constants.xi = [ 0 0 0 1 0];
-constants.xf = [ 5 5 pi/2 1 0];
-constants.N = 15;
-constants.obstacles_circles = [5,0,3];
+% constants.T = 10;
+% constants.xi = [ 0 0 0 1 0];
+% constants.xf = [ 5 5 pi/2 1 0];
+% % constants.obstacles_circles = [5,0,3];
+% constants.plotboatsize = 0.7;
+% constants.N = 15;
+% constants.uselogbar = true; % use log barrier func
 
-% constants.T = 15; % time
+
+% constants.T = 20; % time
 % constants.xi = [5 3 0 1 0]; % x y psi v w
 % constants.xf = [0 0 0 1 0]; % x y psi v w
-% constants.N = 50; % order
 % constants.obstacles = [];
 % constants.obstacles_circles = [];% = surroundhull(constants.obstacles);
 
 % constants.T = 30;
 % constants.xi  = [-10 40 0 1.1 0]; % x y psi v w
 % constants.xf = [0 0 0 1.2 0]; % x y psi v w
-% constants.N = 50; % order
 % constants.obstacles = [];
 % constants.obstacles_circles = [];
+% constants.N = 100;
+% constants.plotboatsize=2;
 
 % 1 vehicle 1 obstacle
 % constants.T = 15;
 % constants.xi = [5 3 0 1 0];
 % constants.xf = [0 0 0 1 0];
-% constants.obstacles = [  1 1 ; 1 2 ; 2 2 ; 2 1 ] + [100 100];
-% constants.obstacles_circles = [];
-% constants.N = 13;
+% constants.obstacles = [  1 1 ; 1 2 ; 2 2 ; 2 1 ];
+% constants.obstacles_circles = [ 1.5, 1.5, 0.5];
+% constants.plotboatsize = 0.5;
 
-% constants.T = 10;
-% constants.xi = [ -5 0 0 1 0];
-% constants.xf = [  5 0 0 1 0];
-% constants.N = 13;
+constants.T = 10;
+constants.xi = [ -5 0 0 1 0];
+constants.xf = [  5 0 0 1 0];
+constants.N = 30;
 % constants.obstacles = [ -0.5 -0.5; -0.5 0.5; 0.5 0.5; 0.5 -0.5 ];
-% constants.obstacles_circles = [];
+constants.obstacles_circles = [0, 0, 1];
+constants.uselogbar = true;
+constants.useeqlogbar = true;
 
 % 2 vehicles no obstacles
-% constants.N = 30;
 % constants.T = 15;
 % constants.xi = [
 %     0 5 0 1 0
@@ -54,11 +58,8 @@ constants.obstacles_circles = [5,0,3];
 %     10 5 0 1 0
 %     5 10 pi/2 1 0 
 % ];
-% constants.obstacles = [];
-% constants.obstacles_circles = [];
 
 % 3 vehicles 1 circle obstacle
-% constants.N = 40;
 % constants.T = 15;
 % constants.xi = [
 %     -10 4 0 1 0
@@ -70,20 +71,23 @@ constants.obstacles_circles = [5,0,3];
 %     10 1 0 1 0
 %     10 0 0 1 0
 % ];
-% constants.obstacles = [];
 % constants.obstacles_circles = [ 0 0 3]; % x y r
+% constants.plotboatsize = 1;
+% constants.uselogbar = true; % use log barrier func
 
 % common parameters
 constants.min_dist_int_veh = .9;
-% constants.numvars = size(constants.xi,2);
 constants.Nv = size(constants.xi,1);%number of vehicles
-% constants.uselogbar = true; % use log barrier func
-% constants.usesigma = true; % a variable for the usage of log barrier func
+
+constants.statebounds = [
+    -Inf, -Inf, -2*pi, 0, -pi/4;
+    Inf, Inf, 2*pi, 5, pi/4;
+];
 
 % functions
 constants.costfun_single = @costfun_single;
 constants.dynamics = @dynamicsDubin;
-% constants.init_guess = @init_guess;
+constants.init_guess = @init_guess;
 constants.recoverxy = @recoverplot;
 
 
@@ -92,11 +96,17 @@ constants.recoverxy = @recoverplot;
 %%% run
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [xOut,JOut] = run_problem(constants);
-
+constants = processconstants(constants);
 disp(['The final cost is ', num2str(JOut)])
 %%
 %constraint_evaluation(xOut,constants);
 plot_xy(xOut,constants);
+points = BernsteinEval(xOut,constants.T,linspace(0,constants.T,10));
+for v = 1:size(constants.xi, 1)
+    for i = 1:10
+        plotboat(points(i,1,v),points(i,2,v),points(i,3,v),constants.plotboatsize);
+    end
+end
 
 if constants.Nv == 2
     figure
@@ -106,7 +116,7 @@ if constants.Nv == 2
     BernsteinPlot(Mag,constants.T);
 end
 
-if (isfield(constants,'obstacles_circles') && ~isempty(constants.obstacles_circles))...
+if false && (isfield(constants,'obstacles_circles') && ~isempty(constants.obstacles_circles))...
         && size(constants.obstacles_circles,3) == 1 && constants.Nv == 1
     figure, grid on
     BernsteinPlot(sum((xOut(:,1:2)-constants.obstacles_circles(1:2)).^2,2),constants.T);
@@ -162,9 +172,10 @@ end
 
 function J = costfun_single(X,constants)
     v = X(:,4);
-    r = X(:,5);
+    w = X(:,5);
     a = constants.DiffMat*v;
-    J = sum(a.^2)+2*sum(r.^2);
+    dw = constants.DiffMat*w;
+    J = sum(a.^2)+2*sum(dw.^2);
 end
 
 

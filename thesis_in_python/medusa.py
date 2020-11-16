@@ -2,6 +2,7 @@ from trajecoptim import run_problem, plot_xy
 from scipy.integrate import solve_ivp
 from bernsteinlib import *
 import numpy as np
+from predefined_trajectories import circle_trajectory
 
 
 def main():
@@ -39,39 +40,63 @@ def main():
     constants = {
         'T': 15,
         'xi': np.array([
-            [-10, 4, 0, 1, 0, 0],
-            #            [-10, -4, 0, 1, 0, 0],
-            #            [-10, 0, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0, 0],
+            # [r*np.cos(0), r*np.sin(0), 0, 2*r*np.pi/150, 0, 0],
         ]),
         'xf': np.array([
-            [10, -1, 0, 1, 0, 0],
-            #            [10, 1, 0, 1, 0, 0],
-            #            [10, 0, 0, 1, 0, 0],
+            [0, 6, np.pi, 1, 0, 0],
+            # [r*np.cos(0), r*np.sin(0), 0, 2*r*np.pi/150, 0, 0],
         ]),
         'statebounds': np.array([
-            [-10000, -20000, -30000, -40000, -50000],
-            [10000, 20000, 30000, 40000, 50000],
+            [-10000, -20000, -30000, -.1, -1000, -.74],
+            [10000, 20000, 30000, 1.1, 1000, .74],
         ]),
-        'inputbounds': np.array([[]]),
-        'N': 40,
-        # 'obstacles_circles': [[0, 0, 5]],
-        'obstacles_circles': [],
-        'obstacles_polygons': [],
-        'min_dist_int_veh': 0.85,
-        'min_dist_obs': 0,
+        'inputbounds': np.array([
+            [0, -0.113],
+            [25.9, 0.113],
+        ]),
+        'N': 50,
     }
+
+    #    constants = {
+    #        'T': 15,
+    #        'xi': np.array([
+    #            [-10, 4, 0, 1, 0, 0],
+    #            #            [-10, -4, 0, 1, 0, 0],
+    #            #            [-10, 0, 0, 1, 0, 0],
+    #        ]),
+    #        'xf': np.array([
+    #            [10, -1, 0, 1, 0, 0],
+    #            #            [10, 1, 0, 1, 0, 0],
+    #            #            [10, 0, 0, 1, 0, 0],
+    #        ]),
+    #        'statebounds': np.array([
+    #            [-10000, -20000, -30000, -40000, -50000, -6000],
+    #            [10000, 20000, 30000, 40000, 50000, 6000],
+    #        ]),
+    #        'inputbounds': np.array([[]]),
+    #        'N': 40,
+    #        # 'obstacles_circles': [[0, 0, 5]],
+    #        'obstacles_circles': [],
+    #        'obstacles_polygons': [],
+    #        'min_dist_int_veh': 0.85,
+    #        'min_dist_obs': 0,
+    #    }
 
     constants = {**constants, **{
         # common parameters
         'modelparams': modelparams,
         'numinputs': 2,
-        'uselogbar': False,
-        'usesigma': True,
         # functions
         'costfun_single': costfun_single,
         'dynamics': dynamics,
         'recoverxy': recoverplot,
     }}
+
+    #    constants = {**constants, **{
+    #        # 'desiredpoints': circle_trajectory(np.linspace(0, constants['T'], constants['N']*40), constants['T'], r)
+    #        'desiredpoints': circle_trajectory(np.linspace(0, constants['T'], 1000), constants['T'], r)
+    #    }}
 
     res, elapsedtime, singtimes = run_problem(constants)
     print('The final cost is ' + str(res.fun))
@@ -172,8 +197,6 @@ def dynamics(x, constants):
     d_r = -n_r - n_rr * np.abs(r)
 
     return np.vstack((
-        #        diffmat @ xp - u * np.cos(yaw) - v * np.sin(yaw) + vcx,
-        #        diffmat @ yp - u * np.sin(yaw) + v * np.cos(yaw) + vcy,
         diffmat @ xp - u * np.cos(yaw) + v * np.sin(yaw) + vcx,
         diffmat @ yp - u * np.sin(yaw) - v * np.cos(yaw) + vcy,
         diffmat @ yaw - r,
@@ -184,7 +207,8 @@ def dynamics(x, constants):
 
 
 def costfun_single(x, constants):
-    return np.sum(x[:, 6] ** 2) + 2 * np.sum(x[:, 5] ** 2)
+    return np.sum(x[:, 6] ** 2) + np.sum(x[:, 7] ** 2)
+    # return np.sum((constants['desiredpoints'] - (constants['EvalMat']@x)[:, :2])**2)
 
 
 ################################################################################

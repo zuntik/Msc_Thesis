@@ -2,6 +2,7 @@ from scipy.optimize import minimize
 from bernsteinlib import *
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.patches import Polygon
 from time import time
 
 
@@ -97,15 +98,20 @@ def processconstants(constants_orig):
         # common parameters
         'DiffMat': bernsteinDerivElevMat(constants['N'], constants['T']),
         'ElevMat': bernsteinDegrElevMat(constants['N'], constants['N'] * 10),
+        # 'EvalMat': bernsteinEvalMat(constants['N'], constants['T'], np.linspace(0,constants['T'], constants['N']*40)),
+        'EvalMat': bernsteinEvalMat(constants['N'], constants['T'], np.linspace(0, constants['T'], 1000)),
         'numvars': constants['xi'].shape[1],
         'Nv': constants['xi'].shape[0],
     }}
+
+    constants.setdefault('obstacles_circles', [])
+    constants.setdefault('obstacles_polygons', [])
     # noinspection PyTypeChecker
     constants = {**constants, **{
         'obstacles':
-            [Circle(c[:-1], c[-1], constants['ElevMat'], constants['min_dist_obs'])
+            [TOLCircle(c[:-1], c[-1], constants['ElevMat'], constants['min_dist_obs'])
              for c in constants['obstacles_circles']] +
-            [Polygon(m) for m in constants['obstacles_polygons']]
+            [TOLPolygon(m) for m in constants['obstacles_polygons']]
     }}
 
     constants.setdefault('statebounds', None)
@@ -123,6 +129,7 @@ def run_problem(constants):
     xin = constants.get('init_guess', randinitguess)(constants)
     opts = {'disp': True, 'maxiter': 1000}
     xuc = []
+    res = []
     singtimes = []
     for i in range(constants['Nv']):
         constants2 = constants.copy()
@@ -134,16 +141,18 @@ def run_problem(constants):
         t = time()
         if constants['uselogbar']:
             print('Doing alg for vehicle: ' + str(i))
-            xuc.append(minimize(costfun, xin[:, i], args=constants2, method='Nelder-Mead', options=opts).x)
+            res = minimize(costfun, xin[:, i], args=constants2, method='Nelder-Mead', options=opts)
+            xuc.append(res.x)
         else:
-            xuc.append(minimize(costfun, xin[:, i], args=constants2, method='SLSQP', options=opts, constraints=cons2).x)
+            res = minimize(costfun, xin[:, i], args=constants2, method='SLSQP', options=opts, constraints=cons2)
+            xuc.append(res.x)
         singtimes.append(time()-t)
         print('Elapsed time for vehicle '+str(i) + ': ' + str(singtimes[-1]) + ' s.')
 
     xuc = np.concatenate(xuc)
 
     if not constants['obstacles'] and constants['Nv'] == 1:
-        return xuc
+        return res, singtimes[0], singtimes
 
     cons = (
         {'type': 'eq', 'fun': lambda x: eqconstr(x, constants)},
@@ -154,6 +163,7 @@ def run_problem(constants):
     if constants['uselogbar']:
         res = minimize(costfun, xuc, args=constants, options=opts)
     else:
+        # noinspection PyTypeChecker
         res = minimize(costfun, xuc, args=constants, method='SLSQP', bounds=bnds, constraints=cons, options=opts)
     elapsedtime = time()-t
     print('Elapsed time for joined up problem: ' + str(elapsedtime) + ' s.')
@@ -175,6 +185,9 @@ def plot_xy(res, constants):
         recoveredplot, = ax.plot(xy[1, :], xy[0, :].T)
         recoveredplot.set_label('ODE solution for vehicle ' + str(i))
         ax.legend(loc='upper right', fontsize='x-small')
+        points = bernsteinEval(x[:, :, i], constants['T'], np.linspace(0, constants['T'], 10))
+        for ti in range(10):
+            ax.add_patch(plotboat(points[ti, 1], points[ti, 0], np.pi/2-points[ti, 2], 0.5))
     for obs in constants['obstacles']:
         obs.plot(plotinverted=True, ax=ax)
     plt.show()
@@ -187,7 +200,19 @@ def veh_coll_avoid_isaac(x1, x2, constants):
     # return np.sqrt(np.sum((constants['ElevMat'] @ (x1-x2))**2, axis=1)).flatten() - constants['min_dist_int_veh']
 
 
-class Circle:
+def plotboat(x, y, yaw, size):
+    points = np.array([
+        [size / 2 * np.cos(yaw + np.pi - np.pi / 6), size / 2 * np.sin(yaw + np.pi - np.pi / 6)],
+        [size / 2 * np.cos(yaw + np.pi / 6), size / 2 * np.sin(yaw + np.pi / 6)],
+        [size / 1.5 * np.cos(yaw), size / 1.5 * np.sin(yaw)],
+        [size / 2 * np.cos(yaw - np.pi / 6), size / 2 * np.sin(yaw - np.pi / 6)],
+        [size / 2 * np.cos(yaw - np.pi + np.pi / 6), size / 2 * np.sin(yaw - np.pi + np.pi / 6)],
+    ])
+    points = points + np.array([[x, y]])
+    return Polygon(points, facecolor='.9', edgecolor='.5')
+
+
+class TOLCircle:
     def __init__(self, centre, rad, elevmat, mindist):
         self.centre = centre
         self.rad = rad
@@ -207,7 +232,7 @@ class Circle:
             ax.plot(x, y)
 
 
-class Polygon:
+class TOLPolygon:
     def __init__(self, matrix):
         self.matrix = matrix
 
