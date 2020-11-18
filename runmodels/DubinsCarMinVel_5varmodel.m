@@ -40,13 +40,13 @@ addpath('..\TrajecOptimLib');
 % constants.plotboatsize = 0.5;
 
 constants.T = 10;
-constants.xi = [ -5 0 0 1 0];
+constants.xi = [ -5 0 0 1 0]; % x y psi v r
 constants.xf = [  5 0 0 1 0];
 constants.N = 30;
 % constants.obstacles = [ -0.5 -0.5; -0.5 0.5; 0.5 0.5; 0.5 -0.5 ];
 constants.obstacles_circles = [0, 0, 1];
-constants.uselogbar = true;
-constants.useeqlogbar = true;
+% constants.uselogbar = true;
+% constants.useeqlogbar = true;
 
 % 2 vehicles no obstacles
 % constants.T = 15;
@@ -72,12 +72,9 @@ constants.useeqlogbar = true;
 %     10 0 0 1 0
 % ];
 % constants.obstacles_circles = [ 0 0 3]; % x y r
-% constants.plotboatsize = 1;
-% constants.uselogbar = true; % use log barrier func
 
 % common parameters
 constants.min_dist_int_veh = .9;
-constants.Nv = size(constants.xi,1);%number of vehicles
 
 constants.statebounds = [
     -Inf, -Inf, -2*pi, 0, -pi/4;
@@ -90,17 +87,20 @@ constants.dynamics = @dynamicsDubin;
 constants.init_guess = @init_guess;
 constants.recoverxy = @recoverplot;
 
-
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[xOut,JOut] = run_problem(constants);
+% [xOut,JOut] = run_problem(constants);
+[xOut,JOut] = run_problem_progressive_n(constants);
 constants = processconstants(constants);
 disp(['The final cost is ', num2str(JOut)])
+
 %%
+
 %constraint_evaluation(xOut,constants);
 plot_xy(xOut,constants);
+% plot some boats
 points = BernsteinEval(xOut,constants.T,linspace(0,constants.T,10));
 for v = 1:size(constants.xi, 1)
     for i = 1:10
@@ -108,21 +108,7 @@ for v = 1:size(constants.xi, 1)
     end
 end
 
-if constants.Nv == 2
-    figure
-    X_diff = xOut(:,1:2,1)-xOut(:,1:2,2);
-    X_diff_2 = BernsteinPow(X_diff,2);
-    Mag = sqrt(sum(X_diff_2,2));
-    BernsteinPlot(Mag,constants.T);
-end
-
-if false && (isfield(constants,'obstacles_circles') && ~isempty(constants.obstacles_circles))...
-        && size(constants.obstacles_circles,3) == 1 && constants.Nv == 1
-    figure, grid on
-    BernsteinPlot(sum((xOut(:,1:2)-constants.obstacles_circles(1:2)).^2,2),constants.T);
-end
-
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -130,7 +116,7 @@ function [t,xy] = recoverplot(X,constants)
 
     v = @(t) BernsteinEval(X(:,4),constants.T,t);
     w = @(t) BernsteinEval(X(:,5),constants.T,t);
-    
+
     [t,xy] = ode45(@(t,xy)odefunc(t,xy,v,w), [0 constants.T], X(1,1:3));
 
     function dydt = odefunc(t,y,v,w)
@@ -148,7 +134,7 @@ end
 function [c,ceq] = dynamicsDubin(X,constants)
 
     DiffMat = constants.DiffMat;
-    
+
     xp = X(:,1);
     yp = X(:,2);
     psi = X(:,3);
@@ -160,22 +146,24 @@ function [c,ceq] = dynamicsDubin(X,constants)
         DiffMat*yp - v.*sin(psi)
         DiffMat*psi - w
     ];
-    %c=[-v+0.8;v-1.2 ;psi-pi;-psi-pi];
-    %c = [-v+0.2;psi-pi;-psi-pi]; % this one is venanzio's
-    %c = [ -v; psi-pi-pi/3; -psi-pi-pi/3];
-    %c = -v + 0.2 ;
+
     c = [];
-    %c = constants.maxtorque- Xout(:,8);
-    
+
 end
 
 
 function J = costfun_single(X,constants)
+    persistent nchoosek_mat N
+    if isempty(nchoosek_mat) || constants.N ~= N
+        N = constants.N;
+        nchoosek_mat = nchoosek_mod_mat(2*N+3);
+    end
     v = X(:,4);
     w = X(:,5);
-    a = constants.DiffMat*v;
+    dv = constants.DiffMat*v;
     dw = constants.DiffMat*w;
-    J = sum(a.^2)+2*sum(dw.^2);
+%     J = sum(dv.^2)+2*sum(dw.^2);
+    J = BernsteinIntegr(BernsteinMul(dv, dv, nchoosek_mat)+2*BernsteinMul(dw, dw, nchoosek_mat), constants.T);
 end
 
 
@@ -194,21 +182,5 @@ function xinit = init_guess(constants)
         xinit(:,i) = [x;y;psi;v;w];
     end
     %xinit = xinit(:);
-    
-end
 
-
-function xinit = rand_init_guess(constants) %#ok<*DEFNU>
-
-    N = constants.N; 
-
-    x = rand(N-1,1);
-    y = rand(N-1,1);
-    psi = rand(N-1,1);
-    v = rand(N-1,1);
-    w = rand(N-1,1);
-
-    xinit = [x;y;psi;v;w];
-    xinit = xinit(:);
-    
 end

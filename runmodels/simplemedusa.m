@@ -76,7 +76,7 @@ constants.xf = [
     40 -5 0 .9 0 0
     40 0 0 .9 0 0
     ];
-constants.N = 20;
+constants.N = 10;
 
 % constants.T = 60; % time
 % constants.xi = [0 0 0    1 0 0]; % x y yaw u v r
@@ -152,7 +152,9 @@ constants.recoverxy = @recoverplot;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-xOut = run_problem(constants);
+xOut = run_problem_progressive_n(constants);
+%xOut = run_problem(constants);
+
 %%
 constants = processconstants(constants);
 

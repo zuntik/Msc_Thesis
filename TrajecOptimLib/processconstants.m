@@ -1,6 +1,11 @@
 function constants = processconstants(constantsIn)
+% function that adds more necessary information for the optimisation to run
+% that includes calculating degree elevatiom matrices and setting default
+% parameters
 
     constants = constantsIn;
+    
+    % isfied checks if a field in a structure is defined
     
     if isfield(constantsIn,'filled') && constantsIn.filled == true
         return
@@ -40,6 +45,10 @@ function constants = processconstants(constantsIn)
     
     if ~isfield(constants, 'useeqlogbar')
         constants.useeqlogbar = true;
+    end
+    
+    if ~isfield(constants,'init_guess')
+        constants.init_guess = @rand_init_guess;
     end
     
     constants.DiffMat = BernsteinDerivElevMat(constants.N,constants.T);

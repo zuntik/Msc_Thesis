@@ -3,13 +3,7 @@ function [xOut,J] = run_problem(constants)
 
     constants=processconstants(constants);
 
-    if ~isfield(constants,'init_guess')
-        xIn = rand_init_guess(constants);
-    else
-        xIn = constants.init_guess(constants);
-    end
-
-    xIn = reshape(xIn, [], constants.Nv);
+    xIn = reshape(constants.init_guess(constants), [], constants.Nv);
 
     options_fmincon = optimoptions(@fmincon,'Display','Iter','Algorithm','sqp','MaxFunctionEvaluations',Inf,'StepTolerance',eps,'MaxIterations',Inf);
     % options = optimoptions(@fmincon,'Display','Iter','Algorithm','sqp');
@@ -27,7 +21,7 @@ function [xOut,J] = run_problem(constants)
         CONSTANTS2.xi = constants.xi(i,:);
         CONSTANTS2.xf = constants.xf(i,:);
         if constants.uselogbar
-            if constants.useeqlogbar
+            if constants.useeqlogbar % use this if we want to put eq constraints on log bar
                 [xOut_i,J] = fminsearch(@(x)costfun(x,CONSTANTS2),xIn(:,i),options_fminsearch);
 %                 [xOut_i,J] = fmincon(@(x)costfun(x,CONSTANTS2),xIn(:,i),[],[]);
             else
