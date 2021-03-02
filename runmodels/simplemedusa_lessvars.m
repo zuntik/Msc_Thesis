@@ -91,22 +91,10 @@ xOut = run_problem(constants);
 %constraint_evaluation(xOut,constants);
 plot_xy(xOut,constants);
 
-times = linspace(0,constants.T,10);
-
-points = BernsteinEval(xOut,constants.T,times);
-for i = 1:10
-    plotboat(points(i,1),points(i,2),points(i,3),0.5);
-end
-
-if ~isempty(constants.obstacles_circles) && size(constants.obstacles_circles,3) == 1 && constants.Nv == 1
-    figure, grid on
-    BernsteinPlot(sum((xOut(:,1:2)-constants.obstacles_circles(1:2)).^2,2),constants.T);
-end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [t,xy] = recoverplot(X,constants)
+function [t,xy, tenpoints] = recoverplot(X,constants)
 
 
 %     tau_u = @(t)calc_tau_u(X, constants, t);
@@ -119,6 +107,8 @@ function [t,xy] = recoverplot(X,constants)
     
     [t,xy] = ode45(@(t,xy)odefunc(t,xy,tau_u,tau_r,constants.MODELPARAMS), [0 constants.T], xi);
 
+    tenpoints = BernsteinEval(X,constants.T,linspace(0,constants.T,10));
+    
     function dydt = odefunc(t,y,tau_u,tau_r,MODELPARAMS)
 
         % load the parameters

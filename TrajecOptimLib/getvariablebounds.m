@@ -1,7 +1,7 @@
 function [lb, ub] = getvariablebounds(constants)
     
     if ~isfield(constants,'statebounds') || isempty(constants.statebounds)
-        lb_s = Inf*ones((constants.N-1)*constants.numvars,1);
+        lb_s = -Inf*ones((constants.N-1)*constants.numvars,1);
         ub_s = Inf*ones((constants.N-1)*constants.numvars,1);
     else
         lb_s = repmat(constants.statebounds(1,:), constants.N-1, 1);
@@ -14,7 +14,7 @@ function [lb, ub] = getvariablebounds(constants)
     if ~isfield(constants,'inputbounds') || ...
         isempty(constants.inputbounds) || ...
         constants.numinputs == 0      
-        lb_i = Inf*ones((constants.N+1)*constants.numinputs,1);
+        lb_i = -Inf*ones((constants.N+1)*constants.numinputs,1);
         ub_i = Inf*ones((constants.N+1)*constants.numinputs,1);
     else
         lb_i = repmat(constants.inputbounds(1,:), constants.N+1, 1);

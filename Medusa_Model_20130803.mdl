@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.225"
+    ComputedModelVersion    "1.227"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -69,53 +69,86 @@ Model {
       }
       Array {
 	Type			"Simulink.EditorInfo"
-	Dimension		6
+	Dimension		9
 	Object {
 	  $ObjectID		  5
 	  IsActive		  [1]
 	  IsTabbed		  [1]
-	  ViewObjType		  "SimulinkTopLevel"
-	  LoadSaveID		  "0"
-	  Extents		  [1864.0, 700.0]
+	  ViewObjType		  "SimulinkSubsys"
+	  LoadSaveID		  "496"
+	  Extents		  [1864.0, 839.0]
 	  ZoomFactor		  [1.0]
-	  Offset		  [-28.0, -23.333333333333314]
-	  SceneRectInView	  [-28.0, -23.333333333333314, 1242.6666666666667, 466.66666666666669]
+	  Offset		  [-121.64880952381077, -78.0845271831468]
+	  SceneRectInView	  [-121.64880952381077, -78.0845271831468, 1242.6666666666667, 559.33333333333337]
 	}
 	Object {
 	  $ObjectID		  6
 	  IsActive		  [0]
 	  IsTabbed		  [0]
 	  ViewObjType		  "SimulinkSubsys"
-	  LoadSaveID		  "27"
-	  Extents		  [1864.0, 700.0]
+	  LoadSaveID		  "473"
+	  Extents		  [1864.0, 839.0]
 	  ZoomFactor		  [1.0]
-	  Offset		  [-66.0, -52.833333333333314]
-	  SceneRectInView	  [-66.0, -52.833333333333314, 1242.6666666666667, 466.66666666666669]
+	  Offset		  [-348.83333333333337, -100.83333333333337]
+	  SceneRectInView	  [-348.83333333333337, -100.83333333333337, 1242.6666666666667, 559.33333333333337]
 	}
 	Object {
 	  $ObjectID		  7
 	  IsActive		  [0]
 	  IsTabbed		  [0]
 	  ViewObjType		  "SimulinkSubsys"
-	  LoadSaveID		  "403"
-	  Extents		  [1864.0, 700.0]
+	  LoadSaveID		  "27"
+	  Extents		  [1864.0, 839.0]
 	  ZoomFactor		  [1.0]
-	  Offset		  [-420.26302083333337, -144.33333333333334]
-	  SceneRectInView	  [-420.26302083333337, -144.33333333333334, 1242.6666666666667, 466.66666666666669]
+	  Offset		  [-66.0, -161.16666666666669]
+	  SceneRectInView	  [-66.0, -161.16666666666669, 1242.6666666666667, 559.33333333333337]
 	}
 	Object {
 	  $ObjectID		  8
 	  IsActive		  [0]
 	  IsTabbed		  [0]
-	  ViewObjType		  "SimulinkSubsys"
-	  LoadSaveID		  "496"
-	  Extents		  [1864.0, 700.0]
+	  ViewObjType		  "SimulinkTopLevel"
+	  LoadSaveID		  "0"
+	  Extents		  [1864.0, 839.0]
 	  ZoomFactor		  [1.0]
-	  Offset		  [-121.64880952381075, -38.502387699626837]
-	  SceneRectInView	  [-121.64880952381075, -38.502387699626837, 1242.6666666666667, 466.66666666666669]
+	  Offset		  [-28.0, -131.66666666666669]
+	  SceneRectInView	  [-28.0, -131.66666666666669, 1242.6666666666667, 559.33333333333337]
 	}
 	Object {
 	  $ObjectID		  9
+	  IsActive		  [0]
+	  IsTabbed		  [0]
+	  ViewObjType		  "SimulinkSubsys"
+	  LoadSaveID		  "396"
+	  Extents		  [1864.0, 839.0]
+	  ZoomFactor		  [1.0]
+	  Offset		  [-397.66536458333337, -120.83333333333337]
+	  SceneRectInView	  [-397.66536458333337, -120.83333333333337, 1242.6666666666667, 559.33333333333337]
+	}
+	Object {
+	  $ObjectID		  10
+	  IsActive		  [0]
+	  IsTabbed		  [0]
+	  ViewObjType		  "SimulinkSubsys"
+	  LoadSaveID		  "1"
+	  Extents		  [1864.0, 839.0]
+	  ZoomFactor		  [1.0]
+	  Offset		  [-223.83333333333337, -31.166666666666686]
+	  SceneRectInView	  [-223.83333333333337, -31.166666666666686, 1242.6666666666667, 559.33333333333337]
+	}
+	Object {
+	  $ObjectID		  11
+	  IsActive		  [0]
+	  IsTabbed		  [0]
+	  ViewObjType		  "SimulinkSubsys"
+	  LoadSaveID		  "403"
+	  Extents		  [1864.0, 839.0]
+	  ZoomFactor		  [1.0]
+	  Offset		  [-420.26302083333337, -190.66666666666669]
+	  SceneRectInView	  [-420.26302083333337, -190.66666666666669, 1242.6666666666667, 559.33333333333337]
+	}
+	Object {
+	  $ObjectID		  12
 	  IsActive		  [0]
 	  IsTabbed		  [0]
 	  ViewObjType		  "SimulinkSubsys"
@@ -126,7 +159,7 @@ Model {
 	  SceneRectInView	  [-252.38020833333337, -190.33333333333334, 1242.6666666666667, 466.66666666666669]
 	}
 	Object {
-	  $ObjectID		  10
+	  $ObjectID		  13
 	  IsActive		  [0]
 	  IsTabbed		  [0]
 	  ViewObjType		  "SimulinkSubsys"
@@ -140,7 +173,7 @@ Model {
       }
       Object {
 	$PropName		"DockComponentsInfo"
-	$ObjectID		11
+	$ObjectID		14
 	$ClassName		"Simulink.DockComponentInfo"
 	Type			"GLUE2:PropertyInspector"
 	ID			"Property Inspector"
@@ -157,7 +190,7 @@ Model {
       "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
       "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAACTAP///wAAAAEAAAAAAAAAAPwCA"
       "AAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvAFAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZ"
-      "QBjAHQAbwByAAAAAAD/////AAACgAD///8AAAeAAAADCAAAAAEAAAACAAAAAQAAAAL8AAAAAA=="
+      "QBjAHQAbwByAAAAAAD/////AAACgAD///8AAAeAAAADkwAAAAEAAAACAAAAAQAAAAL8AAAAAA=="
       Array {
 	Type			"Cell"
 	Dimension		0
@@ -174,9 +207,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "thomas"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Oct 12 11:14:01 2020"
-  RTWModifiedTimeStamp	  524401922
-  ModelVersionFormat	  "1.%<AutoIncrement:225>"
+  LastModifiedDate	  "Mon Dec 21 18:33:27 2020"
+  RTWModifiedTimeStamp	  530473836
+  ModelVersionFormat	  "1.%<AutoIncrement:227>"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
   LibraryLinkDisplay	  "none"
@@ -234,7 +267,7 @@ Model {
   TryForcingSFcnDF	  off
   Object {
     $PropName		    "DataLoggingOverride"
-    $ObjectID		    12
+    $ObjectID		    15
     $ClassName		    "Simulink.SimulationData.ModelLoggingInfo"
     model_		    "Medusa_Model_20130803"
     Array {
@@ -278,7 +311,7 @@ Model {
     Type		    "Handle"
     Dimension		    1
     Simulink.ConfigSet {
-      $ObjectID		      13
+      $ObjectID		      16
       Version		      "20.0.1"
       DisabledProps	      []
       Description	      ""
@@ -286,7 +319,7 @@ Model {
 	Type			"Handle"
 	Dimension		10
 	Simulink.SolverCC {
-	  $ObjectID		  14
+	  $ObjectID		  17
 	  Version		  "20.0.1"
 	  DisabledProps		  []
 	  Description		  ""
@@ -329,7 +362,7 @@ Model {
 	  ODENIntegrationMethod	  "ode3"
 	}
 	Simulink.DataIOCC {
-	  $ObjectID		  15
+	  $ObjectID		  18
 	  Version		  "20.0.1"
 	  DisabledProps		  []
 	  Description		  ""
@@ -371,7 +404,7 @@ Model {
 	  LoggingIntervals	  "[-inf, inf]"
 	}
 	Simulink.OptimizationCC {
-	  $ObjectID		  16
+	  $ObjectID		  19
 	  Version		  "20.0.1"
 	  Array {
 	    Type		    "Cell"
@@ -445,7 +478,7 @@ Model {
 	  EfficientTunableParamExpr off
 	}
 	Simulink.DebuggingCC {
-	  $ObjectID		  17
+	  $ObjectID		  20
 	  Version		  "20.0.1"
 	  Array {
 	    Type		    "Cell"
@@ -566,7 +599,7 @@ Model {
 	  ArithmeticOperatorsInVariantConditions "warning"
 	}
 	Simulink.HardwareCC {
-	  $ObjectID		  18
+	  $ObjectID		  21
 	  Version		  "20.0.1"
 	  DisabledProps		  []
 	  Description		  ""
@@ -616,7 +649,7 @@ Model {
 	  HardwareBoardFeatureSet "EmbeddedCoderHSP"
 	}
 	Simulink.ModelReferenceCC {
-	  $ObjectID		  19
+	  $ObjectID		  22
 	  Version		  "20.0.1"
 	  DisabledProps		  []
 	  Description		  ""
@@ -636,7 +669,7 @@ Model {
 	  SupportModelReferenceSimTargetCustomCode off
 	}
 	Simulink.SFSimCC {
-	  $ObjectID		  20
+	  $ObjectID		  23
 	  Version		  "20.0.1"
 	  DisabledProps		  []
 	  Description		  ""
@@ -671,7 +704,7 @@ Model {
 	}
 	Simulink.RTWCC {
 	  $BackupClass		  "Simulink.RTWCC"
-	  $ObjectID		  21
+	  $ObjectID		  24
 	  Version		  "20.0.1"
 	  Array {
 	    Type		    "Cell"
@@ -760,7 +793,7 @@ Model {
 	    Type		    "Handle"
 	    Dimension		    2
 	    Simulink.CodeAppCC {
-	      $ObjectID		      22
+	      $ObjectID		      25
 	      Version		      "20.0.1"
 	      Array {
 		Type			"Cell"
@@ -850,7 +883,7 @@ Model {
 	    }
 	    Simulink.GRTTargetCC {
 	      $BackupClass	      "Simulink.TargetCC"
-	      $ObjectID		      23
+	      $ObjectID		      26
 	      Version		      "20.0.1"
 	      Array {
 		Type			"Cell"
@@ -958,7 +991,7 @@ Model {
 	  }
 	}
 	SlCovCC.ConfigComp {
-	  $ObjectID		  24
+	  $ObjectID		  27
 	  Version		  "20.0.1"
 	  DisabledProps		  []
 	  Description		  "Simulink Coverage Configuration Component"
@@ -999,7 +1032,7 @@ Model {
 	  CovMcdcMode		  "Masking"
 	}
 	hdlcoderui.hdlcc {
-	  $ObjectID		  25
+	  $ObjectID		  28
 	  Version		  "20.0.1"
 	  DisabledProps		  []
 	  Description		  "HDL Coder custom configuration component"
@@ -1024,11 +1057,11 @@ Model {
   }
   Simulink.ConfigSet {
     $PropName		    "ActiveConfigurationSet"
-    $ObjectID		    13
+    $ObjectID		    16
   }
   Object {
     $PropName		    "DataTransfer"
-    $ObjectID		    26
+    $ObjectID		    29
     $ClassName		    "Simulink.GlobalDataTransfer"
     DefaultTransitionBetweenSyncTasks "Ensure deterministic transfer (maximum delay)"
     DefaultTransitionBetweenAsyncTasks "Ensure data integrity only"
@@ -1370,7 +1403,7 @@ Model {
   System {
     Name		    "Medusa_Model_20130803"
     Location		    [-7, -7, 1288, 688]
-    Open		    on
+    Open		    off
     PortBlocksUseCompactNotation off
     SetExecutionDomain	    off
     ExecutionDomainType	    "Deduce"
@@ -1573,7 +1606,7 @@ Model {
       System {
 	Name			"Simulated Vehicle"
 	Location		[-7, -7, 1288, 688]
-	Open			off
+	Open			on
 	PortBlocksUseCompactNotation off
 	SetExecutionDomain	off
 	ExecutionDomainType	"Deduce"
@@ -1623,83 +1656,83 @@ Model {
 	  RequestExecContextInheritance	off
 	  Object {
 	    $PropName		    "MaskObject"
-	    $ObjectID		    27
+	    $ObjectID		    30
 	    $ClassName		    "Simulink.Mask"
 	    Array {
 	      Type		      "Simulink.MaskParameter"
 	      Dimension		      11
 	      Object {
-		$ObjectID		28
+		$ObjectID		31
 		Type			"edit"
 		Name			"x0"
 		Prompt			"x0"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		29
+		$ObjectID		32
 		Type			"edit"
 		Name			"y0"
 		Prompt			"y0"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		30
+		$ObjectID		33
 		Type			"edit"
 		Name			"yaw0"
 		Prompt			"yaw0"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		31
+		$ObjectID		34
 		Type			"edit"
 		Name			"u0"
 		Prompt			"u0"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		32
+		$ObjectID		35
 		Type			"edit"
 		Name			"v0"
 		Prompt			"v0"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		33
+		$ObjectID		36
 		Type			"edit"
 		Name			"r0"
 		Prompt			"r0"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		34
+		$ObjectID		37
 		Type			"edit"
 		Name			"dist_u"
 		Prompt			"Disturbance in u"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		35
+		$ObjectID		38
 		Type			"edit"
 		Name			"dist_v"
 		Prompt			"Disturbance in v"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		36
+		$ObjectID		39
 		Type			"edit"
 		Name			"dist_r"
 		Prompt			"Disturbance in r"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		37
+		$ObjectID		40
 		Type			"edit"
 		Name			"Vcx"
 		Prompt			"Current x"
 		Value			"0"
 	      }
 	      Object {
-		$ObjectID		38
+		$ObjectID		41
 		Type			"edit"
 		Name			"Vcy"
 		Prompt			"Current y"
@@ -1710,7 +1743,7 @@ Model {
 	  }
 	  System {
 	    Name		    "Dynamics1"
-	    Location		    [142, 53, 1032, 839]
+	    Location		    [-7, -7, 1288, 688]
 	    Open		    off
 	    PortBlocksUseCompactNotation off
 	    SetExecutionDomain	    off
@@ -2425,16 +2458,15 @@ Model {
 	      ZOrder		      9
 	      SrcBlock		      "yi"
 	      SrcPort		      1
-	      Points		      [20, 0; 0, -5]
+	      Points		      [20, 0]
 	      Branch {
-		ZOrder			10
-		Points			[0, -130; -255, 0; 0, 90]
+		ZOrder			43
+		Points			[0, -135; -255, 0; 0, 90]
 		DstBlock		"State Derivatives"
 		DstPort			2
 	      }
 	      Branch {
 		ZOrder			11
-		Points			[0, 5]
 		DstBlock		"Fcn2"
 		DstPort			1
 	      }
@@ -2443,16 +2475,15 @@ Model {
 	      ZOrder		      12
 	      SrcBlock		      "xi"
 	      SrcPort		      1
-	      Points		      [5, 0]
+	      Points		      [5, 0; 0, -5]
 	      Branch {
 		ZOrder			13
-		Points			[0, -65; -220, 0]
+		Points			[0, -60; -220, 0]
 		DstBlock		"State Derivatives"
 		DstPort			1
 	      }
 	      Branch {
 		ZOrder			14
-		Points			[0, -5]
 		DstBlock		"Fcn1"
 		DstPort			1
 	      }
@@ -2919,7 +2950,7 @@ Model {
 	  RequestExecContextInheritance	off
 	  System {
 	    Name		    "Filter2"
-	    Location		    [391, 185, 1009, 740]
+	    Location		    [-7, -7, 1288, 688]
 	    Open		    off
 	    PortBlocksUseCompactNotation off
 	    SetExecutionDomain	    off
@@ -3197,20 +3228,20 @@ Model {
 	  RequestExecContextInheritance	off
 	  Object {
 	    $PropName		    "MaskObject"
-	    $ObjectID		    39
+	    $ObjectID		    42
 	    $ClassName		    "Simulink.Mask"
 	    Array {
 	      Type		      "Simulink.MaskParameter"
 	      Dimension		      2
 	      Object {
-		$ObjectID		40
+		$ObjectID		43
 		Type			"edit"
 		Name			"Kp"
 		Prompt			"Kp"
 		Value			"45"
 	      }
 	      Object {
-		$ObjectID		41
+		$ObjectID		44
 		Type			"edit"
 		Name			"Kd"
 		Prompt			"Kd"
@@ -3221,7 +3252,7 @@ Model {
 	  }
 	  System {
 	    Name		    "Heading Controller"
-	    Location		    [152, 96, 756, 634]
+	    Location		    [-7, -7, 1288, 688]
 	    Open		    off
 	    PortBlocksUseCompactNotation off
 	    SetExecutionDomain	    off
@@ -3480,15 +3511,18 @@ Model {
 	Block {
 	  BlockType		  SubSystem
 	  Name			  "MotorPower"
-	  SID			  "403"
+	  SID			  "406"
 	  Ports			  [5, 2]
-	  Position		  [335, 79, 470, 221]
-	  ZOrder		  -8
-	  DropShadow		  on
+	  Position		  [355, 86, 470, 194]
+	  ZOrder		  3
+	  ErrorFcn		  "Stateflow.Translate.translate"
+	  PermitHierarchicalResolution "ExplicitOnly"
+	  TreatAsAtomicUnit	  on
 	  RequestExecContextInheritance	off
+	  SFBlockType		  "MATLAB Function"
 	  System {
 	    Name		    "MotorPower"
-	    Location		    [-7, -7, 1288, 688]
+	    Location		    [227, 345, 838, 789]
 	    Open		    off
 	    PortBlocksUseCompactNotation off
 	    SetExecutionDomain	    off
@@ -3498,312 +3532,172 @@ Model {
 	    ScreenColor		    "white"
 	    PaperOrientation	    "landscape"
 	    PaperPositionMode	    "auto"
-	    PaperType		    "A4"
-	    PaperUnits		    "centimeters"
-	    TiledPaperMargins	    [1.270000, 1.270000, 1.270000, 1.270000]
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
 	    TiledPageScale	    1
 	    ShowPageBoundaries	    off
 	    ZoomFactor		    "100"
+	    SIDHighWatermark	    "29"
 	    SimulinkSubDomain	    "Simulink"
 	    Block {
 	      BlockType		      Inport
-	      Name		      "Dm Head"
-	      SID		      "404"
-	      Position		      [85, 38, 115, 52]
-	      ZOrder		      -1
+	      Name		      "Dm_Head"
+	      SID		      "406::2"
+	      Position		      [20, 101, 40, 119]
+	      ZOrder		      -2
 	    }
 	    Block {
 	      BlockType		      Inport
-	      Name		      "Cm Speed"
-	      SID		      "405"
-	      Position		      [35, 23, 65, 37]
-	      ZOrder		      -2
+	      Name		      "Cm_Speed"
+	      SID		      "406::1"
+	      Position		      [20, 136, 40, 154]
+	      ZOrder		      -1
 	      Port		      "2"
 	    }
 	    Block {
 	      BlockType		      Inport
 	      Name		      "Cm"
-	      SID		      "519"
-	      Position		      [35, 68, 65, 82]
+	      SID		      "406::25"
+	      Position		      [20, 171, 40, 189]
 	      ZOrder		      -3
 	      Port		      "3"
 	    }
 	    Block {
 	      BlockType		      Inport
 	      Name		      "Dm"
-	      SID		      "520"
-	      Position		      [85, 88, 115, 102]
+	      SID		      "406::26"
+	      Position		      [20, 206, 40, 224]
 	      ZOrder		      -4
 	      Port		      "4"
 	    }
 	    Block {
 	      BlockType		      Inport
 	      Name		      "InnerLoops"
-	      SID		      "521"
-	      Position		      [35, 108, 65, 122]
+	      SID		      "406::24"
+	      Position		      [20, 246, 40, 264]
 	      ZOrder		      -5
 	      Port		      "5"
 	    }
 	    Block {
-	      BlockType		      SubSystem
-	      Name		      "Embedded\nMATLAB Function"
-	      SID		      "406"
-	      Ports		      [5, 2]
-	      Position		      [170, 21, 285, 129]
-	      ZOrder		      -6
-	      ErrorFcn		      "Stateflow.Translate.translate"
-	      PermitHierarchicalResolution "ExplicitOnly"
-	      TreatAsAtomicUnit	      on
-	      RequestExecContextInheritance off
-	      SFBlockType	      "MATLAB Function"
-	      System {
-		Name			"Embedded\nMATLAB Function"
-		Location		[227, 345, 838, 789]
-		Open			off
-		PortBlocksUseCompactNotation off
-		SetExecutionDomain	off
-		ExecutionDomainType	"Deduce"
-		ModelBrowserVisibility	off
-		ModelBrowserWidth	200
-		ScreenColor		"white"
-		PaperOrientation	"landscape"
-		PaperPositionMode	"auto"
-		PaperType		"A4"
-		PaperUnits		"centimeters"
-		TiledPaperMargins	[1.270000, 1.270000, 1.270000, 1.270000]
-		TiledPageScale		1
-		ShowPageBoundaries	off
-		ZoomFactor		"100"
-		SIDHighWatermark	"29"
-		SimulinkSubDomain	"Simulink"
-		Block {
-		  BlockType		  Inport
-		  Name			  "Cm_Speed"
-		  SID			  "406::1"
-		  Position		  [20, 101, 40, 119]
-		  ZOrder		  -1
-		}
-		Block {
-		  BlockType		  Inport
-		  Name			  "Dm_Head"
-		  SID			  "406::2"
-		  Position		  [20, 136, 40, 154]
-		  ZOrder		  -2
-		  Port			  "2"
-		}
-		Block {
-		  BlockType		  Inport
-		  Name			  "Cm"
-		  SID			  "406::25"
-		  Position		  [20, 171, 40, 189]
-		  ZOrder		  -3
-		  Port			  "3"
-		}
-		Block {
-		  BlockType		  Inport
-		  Name			  "Dm"
-		  SID			  "406::26"
-		  Position		  [20, 206, 40, 224]
-		  ZOrder		  -4
-		  Port			  "4"
-		}
-		Block {
-		  BlockType		  Inport
-		  Name			  "InnerLoops"
-		  SID			  "406::24"
-		  Position		  [20, 246, 40, 264]
-		  ZOrder		  -5
-		  Port			  "5"
-		}
-		Block {
-		  BlockType		  Demux
-		  Name			  " Demux "
-		  SID			  "406::28"
-		  Ports			  [1, 1]
-		  Position		  [270, 230, 320, 270]
-		  ZOrder		  2
-		  Outputs		  "1"
-		}
-		Block {
-		  BlockType		  S-Function
-		  Name			  " SFunction "
-		  SID			  "406::27"
-		  Tag			  "Stateflow S-Function 15"
-		  Ports			  [5, 3]
-		  Position		  [180, 100, 230, 220]
-		  ZOrder		  1
-		  FunctionName		  "sf_sfun"
-		  PortCounts		  "[5 3]"
-		  SFunctionDeploymentMode off
-		  EnableBusSupport	  on
-		  SFcnIsStateOwnerBlock	  off
-		  Port {
-		    PortNumber		    2
-		    Name		    "Sm"
-		  }
-		  Port {
-		    PortNumber		    3
-		    Name		    "Pm"
-		  }
-		}
-		Block {
-		  BlockType		  Terminator
-		  Name			  " Terminator "
-		  SID			  "406::29"
-		  Position		  [460, 241, 480, 259]
-		  ZOrder		  3
-		}
-		Block {
-		  BlockType		  Outport
-		  Name			  "Sm"
-		  SID			  "406::6"
-		  Position		  [460, 101, 480, 119]
-		  ZOrder		  -9
-		}
-		Block {
-		  BlockType		  Outport
-		  Name			  "Pm"
-		  SID			  "406::7"
-		  Position		  [460, 136, 480, 154]
-		  ZOrder		  -10
-		  Port			  "2"
-		}
-		Line {
-		  ZOrder		  10
-		  SrcBlock		  "Cm_Speed"
-		  SrcPort		  1
-		  DstBlock		  " SFunction "
-		  DstPort		  1
-		}
-		Line {
-		  ZOrder		  11
-		  SrcBlock		  "Dm_Head"
-		  SrcPort		  1
-		  DstBlock		  " SFunction "
-		  DstPort		  2
-		}
-		Line {
-		  ZOrder		  12
-		  SrcBlock		  "Cm"
-		  SrcPort		  1
-		  DstBlock		  " SFunction "
-		  DstPort		  3
-		}
-		Line {
-		  ZOrder		  13
-		  SrcBlock		  "Dm"
-		  SrcPort		  1
-		  DstBlock		  " SFunction "
-		  DstPort		  4
-		}
-		Line {
-		  ZOrder		  14
-		  SrcBlock		  "InnerLoops"
-		  SrcPort		  1
-		  DstBlock		  " SFunction "
-		  DstPort		  5
-		}
-		Line {
-		  Name			  "Sm"
-		  ZOrder		  15
-		  Labels		  [0, 0]
-		  SrcBlock		  " SFunction "
-		  SrcPort		  2
-		  DstBlock		  "Sm"
-		  DstPort		  1
-		}
-		Line {
-		  Name			  "Pm"
-		  ZOrder		  16
-		  Labels		  [0, 0]
-		  SrcBlock		  " SFunction "
-		  SrcPort		  3
-		  DstBlock		  "Pm"
-		  DstPort		  1
-		}
-		Line {
-		  ZOrder		  17
-		  SrcBlock		  " Demux "
-		  SrcPort		  1
-		  DstBlock		  " Terminator "
-		  DstPort		  1
-		}
-		Line {
-		  ZOrder		  18
-		  SrcBlock		  " SFunction "
-		  SrcPort		  1
-		  Points		  [20, 0]
-		  DstBlock		  " Demux "
-		  DstPort		  1
-		}
+	      BlockType		      Demux
+	      Name		      " Demux "
+	      SID		      "406::28"
+	      Ports		      [1, 1]
+	      Position		      [270, 230, 320, 270]
+	      ZOrder		      2
+	      Outputs		      "1"
+	    }
+	    Block {
+	      BlockType		      S-Function
+	      Name		      " SFunction "
+	      SID		      "406::27"
+	      Tag		      "Stateflow S-Function 15"
+	      Ports		      [5, 3]
+	      Position		      [180, 100, 230, 220]
+	      ZOrder		      1
+	      FunctionName	      "sf_sfun"
+	      PortCounts	      "[5 3]"
+	      SFunctionDeploymentMode off
+	      EnableBusSupport	      on
+	      SFcnIsStateOwnerBlock   off
+	      Port {
+		PortNumber		2
+		Name			"Sm"
+	      }
+	      Port {
+		PortNumber		3
+		Name			"Pm"
 	      }
 	    }
 	    Block {
-	      BlockType		      Outport
-	      Name		      "StarBoard Motor"
-	      SID		      "407"
-	      Position		      [325, 38, 355, 52]
-	      ZOrder		      -7
+	      BlockType		      Terminator
+	      Name		      " Terminator "
+	      SID		      "406::29"
+	      Position		      [460, 241, 480, 259]
+	      ZOrder		      3
 	    }
 	    Block {
 	      BlockType		      Outport
-	      Name		      "Portside Motor"
-	      SID		      "408"
-	      Position		      [325, 93, 355, 107]
-	      ZOrder		      -8
+	      Name		      "Sm"
+	      SID		      "406::6"
+	      Position		      [460, 101, 480, 119]
+	      ZOrder		      -9
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "Pm"
+	      SID		      "406::7"
+	      Position		      [460, 136, 480, 154]
+	      ZOrder		      -10
 	      Port		      "2"
 	    }
 	    Line {
-	      ZOrder		      1
-	      SrcBlock		      "Embedded\nMATLAB Function"
-	      SrcPort		      2
-	      DstBlock		      "Portside Motor"
+	      ZOrder		      10
+	      SrcBlock		      "Dm_Head"
+	      SrcPort		      1
+	      DstBlock		      " SFunction "
 	      DstPort		      1
 	    }
 	    Line {
-	      ZOrder		      2
-	      SrcBlock		      "Embedded\nMATLAB Function"
+	      ZOrder		      11
+	      SrcBlock		      "Cm_Speed"
 	      SrcPort		      1
-	      DstBlock		      "StarBoard Motor"
-	      DstPort		      1
-	    }
-	    Line {
-	      ZOrder		      3
-	      SrcBlock		      "Dm Head"
-	      SrcPort		      1
-	      Points		      [35, 0]
-	      DstBlock		      "Embedded\nMATLAB Function"
+	      DstBlock		      " SFunction "
 	      DstPort		      2
 	    }
 	    Line {
-	      ZOrder		      4
-	      SrcBlock		      "Cm Speed"
-	      SrcPort		      1
-	      Points		      [85, 0]
-	      DstBlock		      "Embedded\nMATLAB Function"
-	      DstPort		      1
-	    }
-	    Line {
-	      ZOrder		      5
+	      ZOrder		      12
 	      SrcBlock		      "Cm"
 	      SrcPort		      1
-	      DstBlock		      "Embedded\nMATLAB Function"
+	      DstBlock		      " SFunction "
 	      DstPort		      3
 	    }
 	    Line {
-	      ZOrder		      6
+	      ZOrder		      13
 	      SrcBlock		      "Dm"
 	      SrcPort		      1
-	      DstBlock		      "Embedded\nMATLAB Function"
+	      DstBlock		      " SFunction "
 	      DstPort		      4
 	    }
 	    Line {
-	      ZOrder		      7
-	      Labels		      [0, 0]
+	      ZOrder		      14
 	      SrcBlock		      "InnerLoops"
 	      SrcPort		      1
-	      DstBlock		      "Embedded\nMATLAB Function"
+	      DstBlock		      " SFunction "
 	      DstPort		      5
+	    }
+	    Line {
+	      Name		      "Sm"
+	      ZOrder		      15
+	      Labels		      [0, 0]
+	      SrcBlock		      " SFunction "
+	      SrcPort		      2
+	      DstBlock		      "Sm"
+	      DstPort		      1
+	    }
+	    Line {
+	      Name		      "Pm"
+	      ZOrder		      16
+	      Labels		      [0, 0]
+	      SrcBlock		      " SFunction "
+	      SrcPort		      3
+	      DstBlock		      "Pm"
+	      DstPort		      1
+	    }
+	    Line {
+	      ZOrder		      17
+	      SrcBlock		      " Demux "
+	      SrcPort		      1
+	      DstBlock		      " Terminator "
+	      DstPort		      1
+	    }
+	    Line {
+	      ZOrder		      18
+	      SrcBlock		      " SFunction "
+	      SrcPort		      1
+	      DstBlock		      " Demux "
+	      DstPort		      1
 	    }
 	  }
 	}
@@ -3876,27 +3770,27 @@ Model {
 	  RequestExecContextInheritance	off
 	  Object {
 	    $PropName		    "MaskObject"
-	    $ObjectID		    42
+	    $ObjectID		    45
 	    $ClassName		    "Simulink.Mask"
 	    Array {
 	      Type		      "Simulink.MaskParameter"
 	      Dimension		      3
 	      Object {
-		$ObjectID		43
+		$ObjectID		46
 		Type			"edit"
 		Name			"Kpu"
 		Prompt			"Kp"
 		Value			"60"
 	      }
 	      Object {
-		$ObjectID		44
+		$ObjectID		47
 		Type			"edit"
 		Name			"Kiu"
 		Prompt			"Ki"
 		Value			"2"
 	      }
 	      Object {
-		$ObjectID		45
+		$ObjectID		48
 		Type			"edit"
 		Name			"KSat"
 		Prompt			"Common Mode Saturation"
@@ -4498,27 +4392,27 @@ Model {
 	      RequestExecContextInheritance off
 	      Object {
 		$PropName		"MaskObject"
-		$ObjectID		46
+		$ObjectID		49
 		$ClassName		"Simulink.Mask"
 		Array {
 		  Type			  "Simulink.MaskParameter"
 		  Dimension		  3
 		  Object {
-		    $ObjectID		    47
+		    $ObjectID		    50
 		    Type		    "edit"
 		    Name		    "K0"
 		    Prompt		    "K0"
 		    Value		    "7.2115"
 		  }
 		  Object {
-		    $ObjectID		    48
+		    $ObjectID		    51
 		    Type		    "edit"
 		    Name		    "tau"
 		    Prompt		    "Atraso do Motor"
 		    Value		    "0.346"
 		  }
 		  Object {
-		    $ObjectID		    49
+		    $ObjectID		    52
 		    Type		    "edit"
 		    Name		    "eta"
 		    Prompt		    "Constante de conversao W-F"
@@ -4722,27 +4616,27 @@ Model {
 	      RequestExecContextInheritance off
 	      Object {
 		$PropName		"MaskObject"
-		$ObjectID		50
+		$ObjectID		53
 		$ClassName		"Simulink.Mask"
 		Array {
 		  Type			  "Simulink.MaskParameter"
 		  Dimension		  3
 		  Object {
-		    $ObjectID		    51
+		    $ObjectID		    54
 		    Type		    "edit"
 		    Name		    "K0"
 		    Prompt		    "K0"
 		    Value		    "7.2115"
 		  }
 		  Object {
-		    $ObjectID		    52
+		    $ObjectID		    55
 		    Type		    "edit"
 		    Name		    "tau"
 		    Prompt		    "Atraso do Motor"
 		    Value		    "0.346"
 		  }
 		  Object {
-		    $ObjectID		    53
+		    $ObjectID		    56
 		    Type		    "edit"
 		    Name		    "eta"
 		    Prompt		    "Constante de conversao W-F"
@@ -5145,7 +5039,7 @@ Model {
 	  }
 	}
 	Line {
-	  ZOrder		  10
+	  ZOrder		  94
 	  SrcBlock		  "MotorPower"
 	  SrcPort		  1
 	  Points		  [0, -10]
@@ -5153,10 +5047,10 @@ Model {
 	  DstPort		  1
 	}
 	Line {
-	  ZOrder		  11
+	  ZOrder		  95
 	  SrcBlock		  "MotorPower"
 	  SrcPort		  2
-	  Points		  [10, 0; 0, -25]
+	  Points		  [10, 0; 0, -10]
 	  DstBlock		  "Thrusters1"
 	  DstPort		  2
 	}
@@ -5195,10 +5089,10 @@ Model {
 	  DstPort		  3
 	}
 	Line {
-	  ZOrder		  17
+	  ZOrder		  97
 	  SrcBlock		  "Speed Controller "
 	  SrcPort		  1
-	  Points		  [30, 0; 0, -95]
+	  Points		  [78, 0; 0, -95]
 	  DstBlock		  "MotorPower"
 	  DstPort		  2
 	}
@@ -5208,15 +5102,15 @@ Model {
 	  SrcPort		  1
 	  Points		  [10, 0]
 	  Branch {
+	    ZOrder		    99
+	    Points		    [0, 85]
+	    DstBlock		    "MotorPower"
+	    DstPort		    4
+	  }
+	  Branch {
 	    ZOrder		    19
 	    DstBlock		    "Heading Controller"
 	    DstPort		    1
-	  }
-	  Branch {
-	    ZOrder		    20
-	    Points		    [0, 85; 260, 0]
-	    DstBlock		    "MotorPower"
-	    DstPort		    4
 	  }
 	}
 	Line {
@@ -5239,30 +5133,29 @@ Model {
 	  SrcPort		  1
 	  Points		  [20, 0]
 	  Branch {
+	    ZOrder		    98
+	    Points		    [0, -15; 205, 0; 0, -30]
+	    DstBlock		    "MotorPower"
+	    DstPort		    3
+	  }
+	  Branch {
 	    ZOrder		    24
 	    DstBlock		    "Speed Controller "
 	    DstPort		    1
 	  }
-	  Branch {
-	    ZOrder		    25
-	    Points		    [0, -35]
-	    DstBlock		    "MotorPower"
-	    DstPort		    3
-	  }
 	}
 	Line {
-	  ZOrder		  26
+	  ZOrder		  96
 	  SrcBlock		  "Heading Controller"
 	  SrcPort		  1
-	  Points		  [30, 0; 0, -10]
 	  DstBlock		  "MotorPower"
 	  DstPort		  1
 	}
 	Line {
-	  ZOrder		  27
+	  ZOrder		  100
 	  SrcBlock		  "InnerLoops"
 	  SrcPort		  1
-	  Points		  [270, 0]
+	  Points		  [264, 0; 0, -175]
 	  DstBlock		  "MotorPower"
 	  DstPort		  5
 	}
@@ -5939,6 +5832,9 @@ Stateflow {
     screen		    [1 1 1920 1080 1.333333333333333]
     treeNode		    [0 27 0 0]
     viewObj		    26
+    visible		    1
+    subviewS {
+    }
     ssIdHighWaterMark	    18
     decomposition	    CLUSTER_CHART
     type		    EML_CHART
@@ -5968,7 +5864,7 @@ Stateflow {
       isEML		      1
       script		      "function x = controller(YawRef, Yaw, Yawrate, Kd, Kp)\nerr = ( YawRef- Yaw );\nif(err>180) \n    "
       " err=err-360;\nelseif(err<-180) \n     err=360+err;\nend\n\nx=Kp*err-Kd*Yawrate;"
-      editorLayout	      "100 M4x1[640 245 1024 718]"
+      editorLayout	      "100 M4x1[10 5 700 500]"
       fimathString	      "fimath(...\n'RoundMode', 'floor',...\n'OverflowMode', 'wrap',...\n'ProductMode', 'KeepLSB', "
       "'ProductWordLength', 32,...\n'SumMode', 'KeepLSB', 'SumWordLength', 32,...\n'CastBeforeSum', true)"
       emlDefaultFimath	      FimathUserSpecified
@@ -6150,7 +6046,7 @@ Stateflow {
     }
     midPoint		    [23.5747 24.9468]
     chart		    26
-    dataLimits		    [23.575 23.575 14.625 34.575]
+    dataLimits		    [21.175 25.975 14.625 42.575]
     subviewer		    26
     drawStyle		    SMART
     slide {
@@ -6169,12 +6065,15 @@ Stateflow {
   chart {
     id			    37
     machine		    1
-    name		    "Simulated Vehicle/MotorPower/Embedded\nMATLAB Function"
+    name		    "Simulated Vehicle/MotorPower"
     windowPosition	    [473 52 213 385]
     viewLimits		    [0 156.75 0 153.75]
     screen		    [1 1 1920 1080 1.333333333333333]
     treeNode		    [0 38 0 0]
     viewObj		    37
+    visible		    1
+    subviewS {
+    }
     ssIdHighWaterMark	    12
     decomposition	    CLUSTER_CHART
     type		    EML_CHART
@@ -6202,7 +6101,7 @@ Stateflow {
     decomposition	    CLUSTER_STATE
     eml {
       isEML		      1
-      script		      "function [Sm,Pm] = fcn(Cm_Speed, Dm_Head, Cm, Dm, InnerLoops)\nCm_sqr=0;\nDm_sqr=0;\nswitch Inner"
+      script		      "function [Sm,Pm] = fcn(Dm_Head, Cm_Speed, Cm, Dm, InnerLoops)\nCm_sqr=0;\nDm_sqr=0;\nswitch Inner"
       "Loops\n    case 0\n        ; % Don't do anything\n    case 1\n        Cm_sqr=Cm_Speed;\n        Dm_sqr=Dm_Head;\n"
       "    case 2\n        Cm_sqr=Cm*abs(Cm);\n        Dm_sqr=Dm_Head;\n    case 3\n        Cm_sqr=Cm_Speed;\n        D"
       "m_sqr=Dm*abs(Dm);\n    case 4\n        Cm_sqr=Cm*abs(Cm);\n        Dm_sqr=Dm*abs(Dm);\n    otherwise\nend\n\nPm "
@@ -6216,6 +6115,31 @@ Stateflow {
   }
   data {
     id			    39
+    ssIdNumber		    9
+    name		    "Dm_Head"
+    scope		    INPUT_DATA
+    machine		    1
+    props {
+      array {
+	size			"-1"
+      }
+      type {
+	method			SF_INHERITED_TYPE
+	primitive		SF_DOUBLE_TYPE
+	isSigned		1
+	wordLength		"16"
+      }
+      complexity	      SF_COMPLEX_INHERITED
+      frame		      SF_FRAME_INHERITED
+      unit {
+	name			"inherit"
+      }
+    }
+    dataType		    "Inherit: Same as Simulink"
+    linkNode		    [37 0 40]
+  }
+  data {
+    id			    40
     ssIdNumber		    5
     name		    "Sm"
     scope		    OUTPUT_DATA
@@ -6235,10 +6159,10 @@ Stateflow {
       }
     }
     dataType		    "Inherit: Same as Simulink"
-    linkNode		    [37 0 40]
+    linkNode		    [37 39 41]
   }
   data {
-    id			    40
+    id			    41
     ssIdNumber		    7
     name		    "Pm"
     scope		    OUTPUT_DATA
@@ -6260,37 +6184,12 @@ Stateflow {
       }
     }
     dataType		    "Inherit: Same as Simulink"
-    linkNode		    [37 39 41]
-  }
-  data {
-    id			    41
-    ssIdNumber		    8
-    name		    "Cm_Speed"
-    scope		    INPUT_DATA
-    machine		    1
-    props {
-      array {
-	size			"-1"
-      }
-      type {
-	method			SF_INHERITED_TYPE
-	primitive		SF_DOUBLE_TYPE
-	isSigned		1
-	wordLength		"16"
-      }
-      complexity	      SF_COMPLEX_INHERITED
-      frame		      SF_FRAME_INHERITED
-      unit {
-	name			"inherit"
-      }
-    }
-    dataType		    "Inherit: Same as Simulink"
     linkNode		    [37 40 42]
   }
   data {
     id			    42
-    ssIdNumber		    9
-    name		    "Dm_Head"
+    ssIdNumber		    8
+    name		    "Cm_Speed"
     scope		    INPUT_DATA
     machine		    1
     props {
@@ -6423,7 +6322,7 @@ Stateflow {
   instance {
     id			    48
     machine		    1
-    name		    "Simulated Vehicle/MotorPower/Embedded\nMATLAB Function"
+    name		    "Simulated Vehicle/MotorPower"
     chart		    37
   }
   chart {

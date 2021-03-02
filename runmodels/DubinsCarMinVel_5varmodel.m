@@ -1,65 +1,38 @@
-clear all; %#ok<CLALL>
+% clear all; %#ok<CLALL>
 
 addpath('..\Bernstein');
 addpath('..\BeBOT_lib');
 addpath('..\TrajecOptimLib');
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dubin car has five state variables: x,y,psi,u,v by that order
+% they appear in xi, xf, and statebounds
+% "constants" is what will define an optimisation probelm. it will have
+% several predefined fields, however:
+% to use log barrier function create uselogbar field and set to true
+% to change order create N field and set to desired variable
+constants = struct();
 
-% 1 vehicle no constraints
-
-% constants.T = 10;
-% constants.xi = [ 0 0 0 1 0];
-% constants.xf = [ 5 5 pi/2 1 0];
-% % constants.obstacles_circles = [5,0,3];
-% constants.plotboatsize = 0.7;
-% constants.N = 15;
-% constants.uselogbar = true; % use log barrier func
-
-
-% constants.T = 20; % time
-% constants.xi = [5 3 0 1 0]; % x y psi v w
-% constants.xf = [0 0 0 1 0]; % x y psi v w
-% constants.obstacles = [];
-% constants.obstacles_circles = [];% = surroundhull(constants.obstacles);
-
-% constants.T = 30;
-% constants.xi  = [-10 40 0 1.1 0]; % x y psi v w
-% constants.xf = [0 0 0 1.2 0]; % x y psi v w
-% constants.obstacles = [];
-% constants.obstacles_circles = [];
-% constants.N = 100;
-% constants.plotboatsize=2;
-
-% 1 vehicle 1 obstacle
-% constants.T = 15;
-% constants.xi = [5 3 0 1 0];
-% constants.xf = [0 0 0 1 0];
-% constants.obstacles = [  1 1 ; 1 2 ; 2 2 ; 2 1 ];
-% constants.obstacles_circles = [ 1.5, 1.5, 0.5];
-% constants.plotboatsize = 0.5;
-
-constants.T = 10;
-constants.xi = [ -5 0 0 1 0]; % x y psi v r
-constants.xf = [  5 0 0 1 0];
-constants.N = 30;
-% constants.obstacles = [ -0.5 -0.5; -0.5 0.5; 0.5 0.5; 0.5 -0.5 ];
-constants.obstacles_circles = [0, 0, 1];
+%%%%%%%%%%%%%%%% Example 0 %%%%%%%%%%%%%%%%
+% constants.T = 80;
+% %                x  y  psi  v  w
+% constants.xi = [ 0  0  pi/4 .1 0 ]; % initial conds
+% constants.xf = [ 10 10 pi/4 .1 0 ]; % final conds
+% constants.N = 70;
+% constants.obstacles_circles = [ 5, 5, 3];
+% % constants.obstacles = [ 5 5 ] + sqrt(2)/2*[-1 1; 1 1; 1 -1; -1 -1];
+% constants.statebounds = [
+%     -Inf, -Inf, -2*pi, 0, -1; % inferior bounds of each state variable
+%     Inf, Inf, 2*pi, 5, 1; % superior bounds of each state variable
+% ];
 % constants.uselogbar = true;
-% constants.useeqlogbar = true;
 
-% 2 vehicles no obstacles
-% constants.T = 15;
-% constants.xi = [
-%     0 5 0 1 0
-%     5 0 pi/2 1 0
-% ];
-% constants.xf = [
-%     10 5 0 1 0
-%     5 10 pi/2 1 0 
-% ];
 
+%%%%%%%%%%%%%%%% Example 5 %%%%%%%%%%%%%%%%
 % 3 vehicles 1 circle obstacle
+
 % constants.T = 15;
 % constants.xi = [
 %     -10 4 0 1 0
@@ -73,51 +46,73 @@ constants.obstacles_circles = [0, 0, 1];
 % ];
 % constants.obstacles_circles = [ 0 0 3]; % x y r
 
-% common parameters
-constants.min_dist_int_veh = .9;
+%%%%%%%%%%%%%%%% Example no constraints  %%%%%%%%%%%%%%%%
 
+constants.T = 60;
+constants.xi = [ 0 0 0 1 0];
+constants.xf = [ 30 30 pi/2 1 0];
+constants.obstacles_circles = [18,10,8];
+% constants.obstacles = [18,10] + [1 1; 1 -1; -1 -1; -1 1]*8/sqrt(2);
+constants.N = 20;
+constants.uselogbar = true;
 constants.statebounds = [
-    -Inf, -Inf, -2*pi, 0, -pi/4;
-    Inf, Inf, 2*pi, 5, pi/4;
+    -Inf, -Inf, -2*pi, 0, -pi/4; % inferior bounds of each state variable
+    Inf, Inf, 2*pi, 1.1, pi/4; % superior bounds of each state variable
 ];
 
-% functions
+%%%%%%%%%%%%%%%% Diagonal Example  %%%%%%%%%%%%%%%%
+% constants.T = 80;
+% constants.xi = [ 0 0 pi/4 1 0];
+% constants.xf = [ 30 30 pi/4 1 0];
+% % constants.obstacles_circles = [15,10,8];
+% % constants.obstacles = [18,10] + [1 1; 1 -1; -1 -1; -1 1]*8/sqrt(2);
+% constants.N = 10;
+% % constants.uselogbar = true;
+% constants.statebounds = [
+%     -Inf, -Inf, -2*pi, 0, -pi/4; % inferior bounds of each state variable
+%     Inf, Inf, 2*pi, 1.1, pi/4; % superior bounds of each state variable
+% ];
+% constants.plotboatsize=2.5;
+
+%%%%%%%%%%%%%%%% Functions %%%%%%%%%%%%%%%%
 constants.costfun_single = @costfun_single;
 constants.dynamics = @dynamicsDubin;
 constants.init_guess = @init_guess;
 constants.recoverxy = @recoverplot;
 
-%%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% [xOut,JOut] = run_problem(constants);
-[xOut,JOut] = run_problem_progressive_n(constants);
-constants = processconstants(constants);
-disp(['The final cost is ', num2str(JOut)])
+[xOut,JOut] = run_problem(constants); % runs once for a desired N
+% [xOut,JOut, X_history, J_history, Times_history] = run_problem_progressive_n(constants); % runs with increasing N
 
 %%
 
+disp(['The final cost is ', num2str(JOut)])
 %constraint_evaluation(xOut,constants);
+% figure, 
+% axis equal, hold on, axis ij,camroll(90)
+% figure
 plot_xy(xOut,constants);
-% plot some boats
-points = BernsteinEval(xOut,constants.T,linspace(0,constants.T,10));
-for v = 1:size(constants.xi, 1)
-    for i = 1:10
-        plotboat(points(i,1,v),points(i,2,v),points(i,3,v),constants.plotboatsize);
-    end
-end
+legend('Bernstein x,y Plot');%, 'Vehicle position in uniform \Delta t')
+xlabel('y'), ylabel('x')
+% txt = string(['Runtime: ','']);
+% annotation('textbox','String',txt);
+plotedit('on');
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [t,xy] = recoverplot(X,constants)
+function [t,xy, tenpoints] = recoverplot(X,constants)
 
     v = @(t) BernsteinEval(X(:,4),constants.T,t);
     w = @(t) BernsteinEval(X(:,5),constants.T,t);
 
     [t,xy] = ode45(@(t,xy)odefunc(t,xy,v,w), [0 constants.T], X(1,1:3));
+
+    tenpoints =  BernsteinEval(X,constants.T,linspace(0,constants.T,10));
 
     function dydt = odefunc(t,y,v,w)
 
@@ -138,32 +133,27 @@ function [c,ceq] = dynamicsDubin(X,constants)
     xp = X(:,1);
     yp = X(:,2);
     psi = X(:,3);
-    v = X(:,4);
+    u = X(:,4);
     w = X(:,5);
 
     ceq = [
-        DiffMat*xp - v.*cos(psi)
-        DiffMat*yp - v.*sin(psi)
+        (DiffMat*xp) - u.*cos(psi)
+        (DiffMat*yp) - u.*sin(psi)
         DiffMat*psi - w
     ];
-
+    
     c = [];
 
 end
 
 
 function J = costfun_single(X,constants)
-    persistent nchoosek_mat N
-    if isempty(nchoosek_mat) || constants.N ~= N
-        N = constants.N;
-        nchoosek_mat = nchoosek_mod_mat(2*N+3);
-    end
+    % the matrix X's columns have, control points for x,y,psi,v,w variables
+    % for 1 vehicle, respectfully
+
     v = X(:,4);
-    w = X(:,5);
-    dv = constants.DiffMat*v;
-    dw = constants.DiffMat*w;
-%     J = sum(dv.^2)+2*sum(dw.^2);
-    J = BernsteinIntegr(BernsteinMul(dv, dv, nchoosek_mat)+2*BernsteinMul(dw, dw, nchoosek_mat), constants.T);
+    J = sum(v.^2)/constants.N;
+
 end
 
 

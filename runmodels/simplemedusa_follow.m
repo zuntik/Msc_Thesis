@@ -42,26 +42,22 @@ MODELPARAMS.Vcy = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % % 1 vehicle no constraints
+
+constants.N = 20;
+
 constants.T = 70; % time
-% constants.T =  5*pi/.9 + 10 + 10;
 constants.r = 10;
-% constants.xi = [constants.r, 0, pi/2, 0.4486, -0.0149, 2*pi/constants.T]; % x y yaw u v r
-% constants.xf = [constants.r, 0, pi/2+2*pi, 0.4486, -0.0149, 2*pi/constants.T ];
-% constants.xi = [constants.r, 0, pi/2, 0.8956, -0.0595, 2*pi/constants.T]; % x y yaw u v r
-% constants.xf = [constants.r, 0, pi/2+2*pi, 0.8956, -0.0595, 2*pi/constants.T ];
 extraang = acos(0.8956/sqrt(0.0595^2+0.8956^2));
 constants.xi = [constants.r, 0, pi/2+extraang, 0.8956, -0.0595, 2*pi/constants.T]; % x y yaw u v r
 constants.xf = [constants.r, 0, pi/2+2*pi+extraang, 0.8956, -0.0595, 2*pi/constants.T ];
-% constants.xi = [constants.r, 0, pi/2, 0.8956, 0, 0]; % x y yaw u v r
-% constants.xf = [constants.r, 0, pi/2+2*pi, 0.8956, 0, 0 ];
-% constants.xi = [0, 0, 0, 0.9, 0, 0];
-% constants.xf = [19, 19, pi/2, 0.9, 0, 0];
+constants.desiredpoints=constants.r*[cos(linspace(0,2*pi,constants.N+1)).',...
+    sin(linspace(0,2*pi,constants.N+1)).'];
 
+% constants.T = 200;
+% constants.desiredpoints=[ linspace(0,constants.T,constants.N+1).', 10.*sin(0.05*linspace(0,constants.T,constants.N+1)).'];
+% constants.xi = [ 0, 0, 0.4630, 1.1177, 0, 0 ];
+% constants.xf = [ 200, -5.4402, -0.4082, 1.0895, 0, 0 ];
 
-%constants.xf = [constants.r 0 pi/2+2*pi 2*pi/constants.T*constants.r 0 2*pi/constants.T ];
-constants.N = 30; % order
-constants.obstacles = [];
-constants.obstacles_circles = [];% = surroundhull(constants.obstacles);
 
 % common parameters
 constants.min_dist_intervehicles = 3;
@@ -70,7 +66,7 @@ constants.numinputs = 2;
 constants.statebounds = [
     % x   y    yaw   u   v     r
     -1000 -1000 -1000 0 -1000 -.74 % lower state bounds
-    1000 1000 1000 1.1 1000 .74 % upper state bounds
+    1000 1000 1000 3 1000 .74 % upper state bounds
     ];
 constants.inputbounds = [
     % t_u t_r
@@ -88,13 +84,6 @@ constants.recoverxy = @recoverplot; %_simulink;
 constants.MODELPARAMS=MODELPARAMS;
 constants.EvalMat = BernsteinEvalMat(constants.N,...
     constants.T, linspace(0, constants.T, 1000));
-constants.desiredpoints=constants.r*[cos(linspace(0,2*pi,constants.N+1)).',...
-    sin(linspace(0,2*pi,constants.N+1)).'];
-% constants.desiredpoints=zeros(constants.N+1, 3);
-% t = linspace(0, constants.T, constants.N+1);
-% for i = 1:constants.N+1
-%     constants.desiredpoints(i,:) = xy_d(t(i));
-% end
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,35 +91,14 @@ constants.desiredpoints=constants.r*[cos(linspace(0,2*pi,constants.N+1)).',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 xOut = run_problem(constants);
 %%
-
+constants = processconstants(constants);
 plot_xy(xOut,constants);
-
-times = linspace(0,constants.T,10);
-
-points = BernsteinEval(xOut,constants.T,times);
-for i = 1:10
-    plotboat(points(i,1),points(i,2),points(i,3),3);
-end
-
-if size(constants.xi,1) == 2
-    figure
-    X_diff = xOut(:,1:2,1)-xOut(:,1:2,2);
-    X_diff_2 = BernsteinPow(X_diff,2);
-    Mag = sqrt(sum(X_diff_2,2));
-    BernsteinPlot(Mag,constants.T);
-end
-
-if ~isempty(constants.obstacles_circles) && size(constants.obstacles_circles,3) == 1 && constants.Nv == 1
-    figure, grid on
-    BernsteinPlot(sum((xOut(:,1:2)-constants.obstacles_circles(1:2)).^2,2),constants.T);
-end
 
 figure
 dxOut = BernsteinDeriv(xOut, constants.T);
 speedangle = @(t) atan2(BernsteinEval(dxOut(:,2),constants.T,t), BernsteinEval(dxOut(:,1),constants.T,t));
 sideslip = @(t) speedangle(t) - BernsteinEval(xOut(:,3),constants.T,t);
 fplot(@(t)sideslip(t)/pi*180, [0, constants.T]);
-
 
 constants.DiffMat = BernsteinDerivElevMat(constants.N,constants.T);
 figure, hold on
@@ -144,7 +112,7 @@ BernsteinPlot(xOut(:,8),constants.T);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [t,xy] = recoverplot(X,constants)
+function [t,xy,tenpoints] = recoverplot(X,constants)
 
 %     tau_u = @(t)calc_tau_u(X, constants, t);
 %     tau_r = @(t)calc_tau_r(X, constants, t);
@@ -152,6 +120,8 @@ function [t,xy] = recoverplot(X,constants)
     tau_r = @(t) BernsteinEval(X(:,8),constants.T,t);
 
     [t,xy] = ode45(@(t,xy)odefunc(t,xy,tau_u,tau_r,constants.MODELPARAMS), [0 constants.T], X(1,1:6));
+
+    tenpoints = BernsteinEval(X,constants.T,linspace(0,constants.T,10));
 
     function dydt = odefunc(t,y,tau_u,tau_r,MODELPARAMS)
 
@@ -266,11 +236,11 @@ function J = costfun_single(X,constants)
 end
     
 function xinit = exact_guess(constants)
-%     xp = constants.desiredpoints(:,1);
-%     yp = constants.desiredpoints(:,2);
+    xp = constants.desiredpoints(:,1);
+    yp = constants.desiredpoints(:,2);
 %     yaw = constants.desiredpoints(:,3);
-    xp = constants.r*cos(linspace(0,2*pi, constants.N+1)).';
-    yp = constants.r*sin(linspace(0,2*pi, constants.N+1)).';
+%     xp = constants.r*cos(linspace(0,2*pi, constants.N+1)).';
+%     yp = constants.r*sin(linspace(0,2*pi, constants.N+1)).';
     yaw = pi/2 + linspace(0, 2*pi, constants.N+1).';
     [u, v, r, tau_u, ~] = calcothers([xp, yp, yaw], constants);
     xvars = [xp, yp, yaw, u, v, r];

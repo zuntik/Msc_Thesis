@@ -5,7 +5,7 @@ function constraint_evaluation(X,constants)
     Xinputs = X(:,constants.numvars+1:end,:);
     X = [ Xvars(:);Xinputs(:)];
     [c,ceq] = nonlcon(X(:),constants);
-    disp((c<0).')
+    disp((c<=0).')
     disp(norm(ceq))
     disp(ceq.')
 
@@ -15,6 +15,9 @@ function constraint_evaluation(X,constants)
         X_diff_2 = BernsteinPow(X_diff,2);
         Mag = sqrt(sum(X_diff_2,2));
         BernsteinPlot(Mag,constants.T);
+%     fplot(@(t)sqrt(BernsteinEval(X_diff_magsquared,constants.T,t)),[0, constants.T]);
+%     fplot(@(t)sqrt(sum(BernsteinEval(X_diff,constants.T,t).^2,2)), [0,constants.T]);
+%     BernsteinPlot(Mag,constants.T);
     end
 
     if false && (isfield(constants,'obstacles_circles') && ~isempty(constants.obstacles_circles))...

@@ -2,28 +2,33 @@ clear; close all;
 
 addpath('..\Bernstein');
 addpath('..\BeBOT_lib');
+addpath('..\TrajecOptimLib\');
 
 % Settings
 
-CONSTANTS.T = 10; % time interval
-CONSTANTS.xi = [5 3 cos(0) sin(0) 1 0]; % x y c s v w
-CONSTANTS.xf = [0 0 cos(0) sin(0) 1 0]; % x y c s v w
-CONSTANTS.N = 20;
-CONSTANTS.DiffMat = BernsteinDerivElevMat(CONSTANTS.N,CONSTANTS.T);
-CONSTANTS.numvars = length(CONSTANTS.xi);
-CONSTANTS.obstacle = [];
+constants.T = 100; % time interval
+constants.xi = [0 0 cos(pi/4) sin(pi/4) .1 0]; % x y c s v w
+constants.xf = [10 10 cos(pi/4) sin(pi/4) .1 0]; % x y c s v w
+constants.N = 20;
+constants.obstacles_circles = [ 5, 5, 1];
+constants.statebounds = [
+    -Inf, -Inf, -1, -1, 0, -1; % inferior bounds of each state variable
+    Inf, Inf, 1, 1, 5, 1; % superior bounds of each state variable
+];
 
-xIn = init_guess(CONSTANTS);
 
-options = optimoptions(@fmincon,'Algorithm','sqp','Display','Iter','MaxFunctionEvaluations',300000,'StepTolerance',eps,'MaxIterations',Inf);
+%%%%%%%%%%%%%%%% Functions %%%%%%%%%%%%%%%%
+constants.costfun_single = @costfun_single;
+constants.dynamics = @dynamicsDubin;
+constants.init_guess = @init_guess;
+constants.recoverxy = @recoverplot;
 
-xOut = fmincon(@(x)costfun(x,CONSTANTS),xIn,[],[],[],[],[],[],@(x)nonlcon(x,CONSTANTS),options);
-xOut = [CONSTANTS.xi; reshape(xOut,[],CONSTANTS.numvars); CONSTANTS.xf];
+
 %%
-figure
-BernsteinPlot(xOut(:,1:2),CONSTANTS.T);
-[~,xy] = recoverplot(xOut,CONSTANTS.T);
-plot(xy(:,1),xy(:,2));
+
+[xOut,JOut] = run_problem(constants); % runs once for a desired N
+
+plot_xy(xOut,constants);
 
 figure
 c = xOut(:,3);
@@ -31,13 +36,19 @@ s = xOut(:,4);
 plot(c.^2+s.^2);
 
 
-function [t,xy] = recoverplot(X,T)
+function [t,xy, tenpoints] = recoverplot(X,constants)
 
-    v = @(t) BernsteinEval(X(:,5),T,t);
-    w = @(t) BernsteinEval(X(:,6),T,t);
+    v = @(t) BernsteinEval(X(:,5),constants.T,t);
+    w = @(t) BernsteinEval(X(:,6),constants.T,t);
     
-    [t,xy] = ode45(@(t,xy)odefunc(t,xy,v,w), [0 T], X(1,1:4));
+    [t,xy] = ode45(@(t,xy)odefunc(t,xy,v,w), [0 constants.T], X(1,1:4));
 
+    tenpoints =  BernsteinEval(X,constants.T,linspace(0,constants.T,10));
+    for i = 1:10
+        tenpoints(i, 3) = atan2(tenpoints(i, 4), tenpoints(i, 3));
+    end
+    tenpoints = tenpoints(:, 1:3);
+    
     function dydt = odefunc(t,y,v,w)
 
         dydt = zeros(4,1);
@@ -51,11 +62,10 @@ function [t,xy] = recoverplot(X,T)
 
 end
 
-function [c,ceq] = nonlcon(X,CONSTANTS)
+function [c,ceq] = dynamicsDubin(X,constants)
 
-    DiffMat = CONSTANTS.DiffMat;
+    DiffMat = constants.DiffMat;
     
-    X = [CONSTANTS.xi; reshape(X,[],CONSTANTS.numvars); CONSTANTS.xf];
     xp = X(:,1);
     yp = X(:,2);
     c = X(:,3);
@@ -72,32 +82,34 @@ function [c,ceq] = nonlcon(X,CONSTANTS)
         %v.^2 - (DiffMat*xp).^2 - (DiffMat*xp).^2
     ];
 
-    c=-v+0.2;
+%     c=-v+0.2;
+    c = [];
 
 end
 
-function J = costfun(X,CONSTANTS)
+function J = costfun_single(X,constants)
 
-    X = reshape(X,[],CONSTANTS.numvars);
-    X = [CONSTANTS.xi; X; CONSTANTS.xf];
     v = X(:,5);
     w = X(:,6);
-    a = CONSTANTS.DiffMat*v;
+    a = constants.DiffMat*v;
     J = sum(a.^2)+2*sum(w.^2);
     
 end
 
-function xinit = init_guess(CONSTANTS)
+function xinit = init_guess(constants)
 
-    N = CONSTANTS.N; 
+    N = constants.N; 
 
-    x = rand(N-1,1);
-    y = rand(N-1,1);
-    c = rand(N-1,1);
-    s = sqrt(1-c.^2);
-    v = rand(N-1,1);
-    w = rand(N-1,1);
+    xinit = zeros((constants.N-1)*constants.numvars,constants.Nv);
+    for i = 1:constants.Nv
+        x = linspace(constants.xi(i,1),constants.xf(i,1),N-1).';
+        y = linspace(constants.xi(i,2),constants.xf(i,2),N-1).';
+        c = rand(N-1,1);
+        s = sqrt(1-c.^2);
+        v = ones(N-1,1);
+        w = zeros(N-1,1);
+        xinit(:,i) = [x;y;c;s;v;w];
+    end
+    %xinit = xinit(:);
 
-    xinit = [x;y;c;s;v;w];
-    
 end

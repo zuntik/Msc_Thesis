@@ -10,6 +10,6 @@ function plotboat(x,y,yaw,size)
 
     points = points + [ x y];
     
-    plot(polyshape(points));
+    plot(polyshape(points),'Facecolor','green');
 
 end

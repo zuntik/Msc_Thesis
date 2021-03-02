@@ -9,7 +9,7 @@ function c = env_collision_avoidance(X,constants)
         obstacle = constants.obstacles(:,:,i);
         [dist, t, pt] = MinDistBernstein2Polygon_extended(X(:,1:2).', obstacle.');
         if dist>0 || length(t) == 1
-            c(:,i) = [ -1; -1];
+            c(:,i) = [ 0; -dist];
         else
             if length(t) == 2 && false
                 cptsleftcut = deCasteljau(X(:,1:2).',t(1));
@@ -23,15 +23,24 @@ function c = env_collision_avoidance(X,constants)
             [~,~,simplex] = gjk2D(p1,p2,'collcheckonly',true);
             support=@(d) p1.support(d)-p2.support(-d);
             if isempty(simplex)
-                c(:,i) = [ -1; -1];
+                c(:,i) = [ 0; 0];
                 continue
             end
             vec_up = directed_epa(support, simplex, [0;1]);
+%             vec_down = directed_epa(support, simplex, [0;-1]);
             %vec_side = directed_epa(support, simplex, [1;0]);
-            %c(:,i) = [vec_up(2); vec_side(1)];
-            c(:,i) = [vec_up(2); -1];   
+            c(:,i) = [vec_up(2); 0];
+%             c(:,i) = [-ramp(vec_up(2)*-vec_down(2)); 0];   
         end
     end
     c = c(:);
     
+end
+
+function y = ramp(x)
+    if x>0
+        y=x;
+    else
+        y=0;
+    end
 end

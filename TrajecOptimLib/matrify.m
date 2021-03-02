@@ -17,7 +17,11 @@ function X = matrify(X,constants)
 %     Xinputs = reshape(Xinputs,[constants.N+1,constants.numinputs,constants.Nv]);
 %     
 %     X = cat(2, Xstatevars, Xinputs);
-
+% 
+    if ~iscolumn(X)
+        return
+    end
+    constants = processconstants(constants);
     X = reshape(X, [], constants.Nv);
     Xstatevars = cat(1,...
         reshape(constants.xi.',[1,constants.numvars,constants.Nv]),...
