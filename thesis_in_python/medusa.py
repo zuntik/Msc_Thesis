@@ -1,6 +1,6 @@
 from trajecoptim import run_problem, plot_xy
 from scipy.integrate import solve_ivp
-from bernsteinlib import *
+import bernsteinlib as bern
 import numpy as np
 from predefined_trajectories import circle_trajectory
 
@@ -145,9 +145,9 @@ def recoverplot(x, constants):
 
         return np.array([dx, dy, dyaw, du, dv, dr])
 
-    def tau_u(t): return bernsteinEval(x[:, 6], constants['T'], t)
+    def tau_u(t): return bern.eval(x[:, 6], constants['T'], t)
 
-    def tau_r(t): return bernsteinEval(x[:, 7], constants['T'], t)
+    def tau_r(t): return bern.eval(x[:, 7], constants['T'], t)
 
     odeargs = (tau_u, tau_r, constants['modelparams'])
     sol = solve_ivp(odefunc, [0, constants['T']], x[0, :6], args=odeargs, dense_output=True, vectorized=True)
@@ -206,7 +206,7 @@ def dynamics(x, constants):
     )).flatten()
 
 
-def costfun_single(x, constants):
+def costfun_single(x, *_):
     return np.sum(x[:, 6] ** 2) + np.sum(x[:, 7] ** 2)
     # return np.sum((constants['desiredpoints'] - (constants['EvalMat']@x)[:, :2])**2)
 

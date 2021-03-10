@@ -1,6 +1,6 @@
 from trajecoptim import run_problem, plot_xy
 from scipy.integrate import solve_ivp
-from bernsteinlib import *
+import bernsteinlib as bern
 import numpy as np
 
 
@@ -79,9 +79,9 @@ def recoverplot(x, constants):
         dpsi = w(t)
         return np.array([dx, dy, dpsi])
 
-    def pol_v(t): return bernsteinEval(x[:, 3], constants['T'], t)
+    def pol_v(t): return bern.eval(x[:, 3], constants['T'], t)
 
-    def pol_w(t): return bernsteinEval(x[:, 4], constants['T'], t)
+    def pol_w(t): return bern.eval(x[:, 4], constants['T'], t)
 
     sol = solve_ivp(odefunc, [0, constants['T']], x[0, :3], args=(pol_v, pol_w), dense_output=True, vectorized=True)
 

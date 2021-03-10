@@ -1,4 +1,0 @@
-% Bernstein Control
-
-Aeq = 
-

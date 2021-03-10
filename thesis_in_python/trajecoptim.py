@@ -1,5 +1,5 @@
 from scipy.optimize import minimize
-from bernsteinlib import *
+import bernsteinlib as bern
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
@@ -96,10 +96,10 @@ def processconstants(constants_orig):
     constants = constants_orig.copy()
     constants = {**constants, **{
         # common parameters
-        'DiffMat': bernsteinDerivElevMat(constants['N'], constants['T']),
-        'ElevMat': bernsteinDegrElevMat(constants['N'], constants['N'] * 10),
-        # 'EvalMat': bernsteinEvalMat(constants['N'], constants['T'], np.linspace(0,constants['T'], constants['N']*40)),
-        'EvalMat': bernsteinEvalMat(constants['N'], constants['T'], np.linspace(0, constants['T'], 1000)),
+        'DiffMat': bern.derivelevmat(constants['N'], constants['T']),
+        'ElevMat': bern.degrelevmat(constants['N'], constants['N'] * 10),
+        # 'EvalMat': bern.evalmat(constants['N'], constants['T'], np.linspace(0,constants['T'], constants['N']*40)),
+        'EvalMat': bern.evalmat(constants['N'], constants['T'], np.linspace(0, constants['T'], 1000)),
         'numvars': constants['xi'].shape[1],
         'Nv': constants['xi'].shape[0],
     }}
@@ -116,7 +116,7 @@ def processconstants(constants_orig):
 
     constants.setdefault('statebounds', None)
     constants.setdefault('inputbounds', None)
-    constants.setdefault('numinputs', None)
+    constants.setdefault('numinputs', 0)
     constants.setdefault('uselogbar', False)
     constants.setdefault('usesigma', True)
     return constants
@@ -179,13 +179,13 @@ def plot_xy(res, constants):
     ax.set_ylabel('x')
     x = matrify(x, constants)
     for i in range(constants['Nv']):
-        curveplot, pointsplot = bernsteinPlot(np.fliplr(x[:, :2, i]), constants['T'], ax=ax)
+        curveplot, pointsplot = bern.plot(np.fliplr(x[:, :2, i]), constants['T'], ax=ax)
         curveplot.set_label('Bernstein Polynomial for vehicle ' + str(i))
         t, xy = constants['recoverxy'](x[:, :, i], constants)
         recoveredplot, = ax.plot(xy[1, :], xy[0, :].T)
         recoveredplot.set_label('ODE solution for vehicle ' + str(i))
         ax.legend(loc='upper right', fontsize='x-small')
-        points = bernsteinEval(x[:, :, i], constants['T'], np.linspace(0, constants['T'], 10))
+        points = bern.eval(x[:, :, i], constants['T'], np.linspace(0, constants['T'], 10))
         for ti in range(10):
             ax.add_patch(plotboat(points[ti, 1], points[ti, 0], np.pi/2-points[ti, 2], 0.5))
     for obs in constants['obstacles']:

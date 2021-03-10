@@ -3,7 +3,7 @@ close all
 
     
 %% Load Parameters    
-CONSTANTS.N = 50; % Order of approximation
+CONSTANTS.N = 20; % Order of approximation
 CONSTANTS.pinit = [0;0];
 CONSTANTS.pfin = [10;10];
 CONSTANTS.pobs = [5;5];

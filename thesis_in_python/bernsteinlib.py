@@ -3,58 +3,59 @@ import matplotlib.pyplot as plt
 from scipy.special import comb
 
 
-def bernsteinAntiDerivMat(n, t):
+def antiderivmat(n, t):
+    """Returns an integral/antiderivative matrix"""
     return np.tril(np.ones((n + 2, n + 1)) * t / (n + 1), -1)
 
 
-def bernsteinAntiDeriv(p, t, p0):
-    return p0 + bernsteinAntiDerivMat(p.shape[0] - 1, t) @ p
+def antideriv(p, t, p0):
+    return p0 + antiderivmat(p.shape[0] - 1, t) @ p
 
 
-def bernsteinBasis(k, n, tau):
+def basis(k, n, tau):
     return comb(n, k) * (1 - tau) ** (n - k) * tau ** k
 
 
-def bernsteinDegrElevMat(n, m):
+def degrelevmat(n, m):
     return np.array([[comb(i, j) * comb(m - i, n - j) if max(0, i - m + n) <= j <= min(n, i) + 1 else 0
                       for j in range(n + 1)] for i in range(m+1)]) / comb(m, n)
 
 
-def bernsteinDegrElev(p, m):
+def degrelev(p, m):
     if p.shape[0] - 1 > m:
         return p
-    return bernsteinDegrElevMat(p.shape[0] - 1, m) @ p
+    return degrelevmat(p.shape[0] - 1, m) @ p
 
 
-def bernsteinDerivMat(n, t):
+def derivmat(n, t):
     return n / t * (np.hstack((np.zeros((n, 1)), np.eye(n))) - np.hstack((np.eye(n), np.zeros((n, 1)))))
 
 
-def bernsteinDeriv(p, t):
-    return bernsteinDerivMat(p.shape[0] - 1, t) @ p
+def deriv(p, t):
+    return derivmat(p.shape[0] - 1, t) @ p
 
 
-def bernsteinDerivElevMat(n, t):
-    return bernsteinDerivMat(n + 1, t) @ bernsteinDegrElevMat(n, n + 1)
+def derivelevmat(n, t):
+    return derivmat(n + 1, t) @ degrelevmat(n, n + 1)
 
 
-def bernsteinDerivElev(p, t):
-    return bernsteinDerivElevMat(p.shape[0] - 1, t) @ p
+def derivelev(p, t):
+    return derivelevmat(p.shape[0] - 1, t) @ p
 
 
-def bernsteinEvalMat(n, t, times):
-    return np.array([[bernsteinBasis(j, n, ti / t) for j in range(n + 1)] for ti in np.array(times).flatten()])
+def evalmat(n, t, times):
+    return np.array([[basis(j, n, ti / t) for j in range(n + 1)] for ti in np.array(times).flatten()])
 
 
-def bernsteinEval(p, t, times):
-    return bernsteinEvalMat(p.shape[0] - 1, t, times) @ p
+def eval(p, t, times):
+    return evalmat(p.shape[0] - 1, t, times) @ p
 
 
-def bernsteinIntegr(p, t):
+def integr(p, t):
     return t / p.shape[0] * np.sum(p, 0)
 
 
-def bernsteinMul(p1, p2):
+def mul(p1, p2):
     if p1.shape[0] < p2.shape[0]:
         p1, p2 = p2, p1
     m = p1.shape[0] - 1
@@ -64,37 +65,37 @@ def bernsteinMul(p1, p2):
                      for i in range(m + n + 1)]) / comb(m + n, n)
 
 
-def bernsteinPow(p, y):
+def pow(p, y):
     if y == 0:
         return np.ones((1, p.shape[1]))
-    temp_p = bernsteinPow(p, y // 2)
+    temp_p = pow(p, y // 2)
     if y % 2 == 0:
-        return bernsteinMul(temp_p, temp_p)
+        return mul(temp_p, temp_p)
     else:
-        return bernsteinMul(p, bernsteinMul(temp_p, temp_p))
+        return mul(p, mul(temp_p, temp_p))
 
 
-def bernsteinSum(p1, p2):
+def sum(p1, p2):
     if p1.shape[0] > p2.shape[0]:
-        p2 = bernsteinDegrElev(p2, p1.shape[0] - 1)
+        p2 = degrelev(p2, p1.shape[0] - 1)
     elif p2.shape[0] > p1.shape[0]:
-        p1 = bernsteinDegrElev(p1, p2.shape[0] - 1)
+        p1 = degrelev(p1, p2.shape[0] - 1)
     return p1 + p2
 
 
-def bernsteinToMonMat(n, t):
+def tomonmat(n, t):
     return np.flipud([[0 if i > k else comb(n, k) * comb(k, i) * (-1) ** (k - i) for i in range(n + 1)] for k in
                       range(n + 1)]) / np.array([t ** i for i in range(n, -1, -1)]).reshape((-1, 1))
 
 
-def bernsteinToMon(p, t):
-    return bernsteinToMonMat(p.shape[0] - 1, t) @ p
+def tomon(p, t):
+    return tomonmat(p.shape[0] - 1, t) @ p
 
 
-def bernsteinPlot(p, t, ax=None):
+def plot(p, t, ax=None):
     n, dim = p.shape
     times = np.linspace(0, t, 100)
-    vals = bernsteinEval(p, t, times)
+    vals = eval(p, t, times)
     curveplot = None
     pointsplot = None
     if ax is None:

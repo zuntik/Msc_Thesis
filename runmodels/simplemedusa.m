@@ -52,34 +52,34 @@ constants.MODELPARAMS=MODELPARAMS;
 % constants.N = 20;
 % constants.obstacles_circles = [ 20, -4, 3];
 
-constants.T = 100;
-constants.xi = [
-    0 -6 0 .9 0 0
-    0 6 0 .9 0 0
-    0 0 0 .9 0 0
-%     0 10 0 .9 0 0
-    ];
-constants.xf = [
-    50 6 0 .9 0 0
-    50 -6 0 .9 0 0
-    50 0 0 .9 0 0
-%     50 -10 0 .9 0 0
-    ];
-constants.obstacles_circles = [20, 0, 3];
-constants.N = 10;
-constants.plotboatsize=3.8;
-constants.uselogbar = true;
-constants.usesigma = true;
+% constants.T = 100;
+% constants.xi = [
+%     0 -6 0 .9 0 0
+% %     0 6 0 .9 0 0
+% %     0 0 0 .9 0 0
+% %     0 10 0 .9 0 0
+%     ];
+% constants.xf = [
+%     50 6 0 .9 0 0
+% %     50 -6 0 .9 0 0
+% %     50 0 0 .9 0 0
+% %     50 -10 0 .9 0 0
+%     ];
+% constants.obstacles_circles = [20, 0, 3];
+% constants.N = 10;
+% constants.plotboatsize=3.8;
+% constants.uselogbar = true;
+% constants.usesigma = true;
 
-% constants.T = 60; % time
-% constants.xi = [0 0 0    1 0 0]; % x y yaw u v r
-% constants.xf = [30 30 pi/2 1 0 0]; % x y yaw u v r
-% constants.N = 20;
+constants.T = 60; % time
+constants.xi = [0 0 0    1 0 0]; % x y yaw u v r
+constants.xf = [30 30 pi/2 1 0 0]; % x y yaw u v r
+constants.N = 20;
 % constants.obstacles_circles = [20,8,8];
 % constants.obstacles_circles = [25,5,8];
 % constants.xf = [30 5 pi/6 1 0 0];
 % constants.xf = [ 0 6 pi 1 0 0 ];
-% constants.uselogbar= true;
+constants.uselogbar= true;
 
 %%%%%%%%%%%%%%%% Diagonal Example %%%%%%%%%%%%%%%%%%%
 % constants.T = 60; % time
